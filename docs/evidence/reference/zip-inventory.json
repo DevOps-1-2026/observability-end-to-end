@@ -1,0 +1,263 @@
+{
+  "path": "C:\\Users\\USUARIO\\Documents\\github\\Observabilidad\\laboratorio-otel\\referencias\\oTelLabs.zip",
+  "sha256": "dfc8fdf4f5b50a11f391185ea58d11ae465af1e6ea0f93e079616052941b4a28",
+  "read_only": true,
+  "extracted": false,
+  "files": [
+    {
+      "name": "oTelLabs/.git/config",
+      "size": 331,
+      "sha256": "d87c788e4261380c28da53438afb6172c4eb5773da9c507bf38727f8596904a2"
+    },
+    {
+      "name": "oTelLabs/.git/description",
+      "size": 73,
+      "sha256": "85ab6c163d43a17ea9cf7788308bca1466f1b0a8d1cc92e26e9bf63da4062aee"
+    },
+    {
+      "name": "oTelLabs/.git/FETCH_HEAD",
+      "size": 95,
+      "sha256": "af3bd596b10666483a0bc09878e25678314fefa7bac89a2401adc5c5e16a4a38"
+    },
+    {
+      "name": "oTelLabs/.git/HEAD",
+      "size": 21,
+      "sha256": "28d25bf82af4c0e2b72f50959b2beb859e3e60b9630a5e8c603dad4ddb2b6e80"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/applypatch-msg.sample",
+      "size": 478,
+      "sha256": "0223497a0b8b033aa58a3a521b8629869386cf7ab0e2f101963d328aa62193f7"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/commit-msg.sample",
+      "size": 896,
+      "sha256": "1f74d5e9292979b573ebd59741d46cb93ff391acdd083d340b94370753d92437"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/fsmonitor-watchman.sample",
+      "size": 4726,
+      "sha256": "e0549964e93897b519bd8e333c037e51fff0f88ba13e086a331592bf801fa1d0"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/post-update.sample",
+      "size": 189,
+      "sha256": "81765af2daef323061dcbc5e61fc16481cb74b3bac9ad8a174b186523586f6c5"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/pre-applypatch.sample",
+      "size": 424,
+      "sha256": "e15c5b469ea3e0a695bea6f2c82bcf8e62821074939ddd85b77e0007ff165475"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/pre-commit.sample",
+      "size": 1649,
+      "sha256": "57185b7b9f05239d7ab52db045f5b89eb31348d7b2177eab214f5eb872e1971b"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/pre-merge-commit.sample",
+      "size": 416,
+      "sha256": "d3825a70337940ebbd0a5c072984e13245920cdf8898bd225c8d27a6dfc9cb53"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/pre-push.sample",
+      "size": 1374,
+      "sha256": "ecce9c7e04d3f5dd9d8ada81753dd1d549a9634b26770042b58dda00217d086a"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/pre-rebase.sample",
+      "size": 4898,
+      "sha256": "4febce867790052338076f4e66cc47efb14879d18097d1d61c8261859eaaa7b3"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/pre-receive.sample",
+      "size": 544,
+      "sha256": "a4c3d2b9c7bb3fd8d1441c31bd4ee71a595d66b44fcf49ddb310252320169989"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/prepare-commit-msg.sample",
+      "size": 1492,
+      "sha256": "e9ddcaa4189fddd25ed97fc8c789eca7b6ca16390b2392ae3276f0c8e1aa4619"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/push-to-checkout.sample",
+      "size": 2783,
+      "sha256": "a53d0741798b287c6dd7afa64aee473f305e65d3f49463bb9d7408ec3b12bf5f"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/sendemail-validate.sample",
+      "size": 2308,
+      "sha256": "44ebfc923dc5466bc009602f0ecf067b9c65459abfe8868ddc49b78e6ced7a92"
+    },
+    {
+      "name": "oTelLabs/.git/hooks/update.sample",
+      "size": 3650,
+      "sha256": "8d5f2fa83e103cf08b57eaa67521df9194f45cbdbcb37da52ad586097a14d106"
+    },
+    {
+      "name": "oTelLabs/.git/index",
+      "size": 2527,
+      "sha256": "4d9abbe8e79ffe1fdb4ff07ff4f5cbe0b130b9b2c42f89f8c55deb1e9d9287f8"
+    },
+    {
+      "name": "oTelLabs/.git/info/exclude",
+      "size": 240,
+      "sha256": "6671fe83b7a07c8932ee89164d1f2793b2318058eb8b98dc5c06ee0a5a3b0ec1"
+    },
+    {
+      "name": "oTelLabs/.git/logs/HEAD",
+      "size": 204,
+      "sha256": "570a22e1feeee2f64b35959bba4fbf0f0da9fabc21fa6130a0e361d230390369"
+    },
+    {
+      "name": "oTelLabs/.git/logs/refs/heads/main",
+      "size": 204,
+      "sha256": "570a22e1feeee2f64b35959bba4fbf0f0da9fabc21fa6130a0e361d230390369"
+    },
+    {
+      "name": "oTelLabs/.git/logs/refs/remotes/origin/HEAD",
+      "size": 204,
+      "sha256": "570a22e1feeee2f64b35959bba4fbf0f0da9fabc21fa6130a0e361d230390369"
+    },
+    {
+      "name": "oTelLabs/.git/objects/pack/pack-028b102c7f697d22b405f0f87edec5d9186d8be9.idx",
+      "size": 3172,
+      "sha256": "bd0bca009b5247e008d71073bfd89ef46995aef9999402f64a5f5d9e4d8805c6"
+    },
+    {
+      "name": "oTelLabs/.git/objects/pack/pack-028b102c7f697d22b405f0f87edec5d9186d8be9.pack",
+      "size": 45951,
+      "sha256": "0d7cd42445aff797b7fd3744c907273c48ede89754ae64d2066cfa139c929419"
+    },
+    {
+      "name": "oTelLabs/.git/objects/pack/pack-028b102c7f697d22b405f0f87edec5d9186d8be9.rev",
+      "size": 352,
+      "sha256": "dd597c2ab4137659bd9de76bf7c2bb1133571c5f92c980548bf1a971a788a51e"
+    },
+    {
+      "name": "oTelLabs/.git/ORIG_HEAD",
+      "size": 41,
+      "sha256": "eeb39a8e5da35dc6d0b89428bc4370a7582797491ba013c97dea616167aaeca8"
+    },
+    {
+      "name": "oTelLabs/.git/packed-refs",
+      "size": 112,
+      "sha256": "298a1c8376f74dfbd2b28345c97a3607a0c158633ba1a4e3b144c7314c30e982"
+    },
+    {
+      "name": "oTelLabs/.git/refs/heads/main",
+      "size": 41,
+      "sha256": "eeb39a8e5da35dc6d0b89428bc4370a7582797491ba013c97dea616167aaeca8"
+    },
+    {
+      "name": "oTelLabs/.git/refs/remotes/origin/HEAD",
+      "size": 30,
+      "sha256": "2bb6a24aa0fc6c484100f5d51a29bbad841cd2c755f5d93faa204e5dbb4eb2b4"
+    },
+    {
+      "name": "oTelLabs/benchmark/analyze_overhead.py",
+      "size": 4622,
+      "sha256": "72b0aa4926be0ddb2ce8ca3cdfe78773eae42d36a53467aa689d8c21e642169c"
+    },
+    {
+      "name": "oTelLabs/benchmark/k6_benchmark.js",
+      "size": 9232,
+      "sha256": "3125468869df41c7be8d897b6197ef14c8dcb1278ff6843d4a3884e19181dfc9"
+    },
+    {
+      "name": "oTelLabs/docker-compose.yaml",
+      "size": 7966,
+      "sha256": "68136d381ce72d2f09db99141b2d9af84f562779632dc99a0c7c5befb954bf92"
+    },
+    {
+      "name": "oTelLabs/grafana/dashboards/otel-lab-dashboard.json",
+      "size": 9716,
+      "sha256": "d02658aa4f2f9209d1ea8e0babb5e81b62c2449e43afaf6aef406540bb50c80b"
+    },
+    {
+      "name": "oTelLabs/grafana/provisioning/dashboards/dashboards.yaml",
+      "size": 269,
+      "sha256": "277770de61839535360fcf15ed4b0425c58d8225d4b03c37dafb1737a2255537"
+    },
+    {
+      "name": "oTelLabs/grafana/provisioning/datasources/datasources.yaml",
+      "size": 1233,
+      "sha256": "5120e94f0cef7c1d1a6d8ab900c2eaedec30f066d51f120831d720b3c5383c95"
+    },
+    {
+      "name": "oTelLabs/K6/k6_otel_labs.js",
+      "size": 12652,
+      "sha256": "38391d61b60e8ed177d5f74996e72416d99046f953a877f7bfbed758937f788e"
+    },
+    {
+      "name": "oTelLabs/K6/resultados_k6.json",
+      "size": 491,
+      "sha256": "7a7f5acd6b0a38b4c7f8f5601a3786ccf2b8652c2fac280adfccba793d6a54b2"
+    },
+    {
+      "name": "oTelLabs/k8s/aws/ecs-task-definition.json",
+      "size": 4864,
+      "sha256": "23a5f8316f34034374360979112ce3c62f2fce59b6b37b75a8698a1fe7e8c9af"
+    },
+    {
+      "name": "oTelLabs/k8s/gcp/deployment.yaml",
+      "size": 8861,
+      "sha256": "c460428f04fd1d54a0e0fb8e9c79c4f4adce8407b58d6c1b49bef20ad6061b8c"
+    },
+    {
+      "name": "oTelLabs/otel-collector/collector-config.yaml",
+      "size": 8598,
+      "sha256": "6d712335eea125f012536f0d695273d8cc31f6337d1bae6c794eae1d9a0896d1"
+    },
+    {
+      "name": "oTelLabs/prometheus/prometheus.yaml",
+      "size": 1173,
+      "sha256": "ec76e2f7adf621886adcb538d4c12361dd7ff3ae8cb74c35862b29e39efdb5da"
+    },
+    {
+      "name": "oTelLabs/README.md",
+      "size": 27707,
+      "sha256": "2c811af53966a1ba4fa917f7dee159b55c8d91a8b5d304d635dfcf2322c336a6"
+    },
+    {
+      "name": "oTelLabs/scripts/init-db.sql",
+      "size": 2610,
+      "sha256": "0fa0c22b774c5c7966c735dd3ee39b925853c1231f43d08523ede8fc46cdf7d1"
+    },
+    {
+      "name": "oTelLabs/service-a/Dockerfile",
+      "size": 1086,
+      "sha256": "2c2fe2822da3369e71589f0b04ad67534da2aa5b9b3bee1578edf432b070f070"
+    },
+    {
+      "name": "oTelLabs/service-a/main.py",
+      "size": 13046,
+      "sha256": "d7e2d6d570c43856d92ec427c7788ad9f7c453b1c0f405104b8a9054aa95a481"
+    },
+    {
+      "name": "oTelLabs/service-a/requirements.txt",
+      "size": 568,
+      "sha256": "03b3784a47cf429ce859a67f693fc08332f0a18750e1b07dae23f06ad32758e2"
+    },
+    {
+      "name": "oTelLabs/service-b/Dockerfile",
+      "size": 488,
+      "sha256": "b81d1963388e59e0a910a4d6d54b420542862dbd1d51ab92e69c316214193783"
+    },
+    {
+      "name": "oTelLabs/service-b/main.py",
+      "size": 11403,
+      "sha256": "32bfa9845d5204d60f661c54a37c916ef8067be6c1de283faee273db414a69dd"
+    },
+    {
+      "name": "oTelLabs/service-b/requirements.txt",
+      "size": 570,
+      "sha256": "00bbf7eaca9b6db179109b84b69155f0d30e3f4ea5dc25822f9f33dd372fb8e2"
+    },
+    {
+      "name": "oTelLabs/tempo/tempo.yaml",
+      "size": 848,
+      "sha256": "72aa847de0e8b2cf6fe2e13e4d866b7e62403b1fb494b0e819e3b76934e11c87"
+    }
+  ]
+}

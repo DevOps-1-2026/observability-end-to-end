@@ -1,0 +1,20 @@
+[
+  {
+    "backend": "collector",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "backend": "prometheus",
+    "exit_code": 0,
+    "stdout": "Checking /config.yaml\n SUCCESS: /config.yaml is valid prometheus config file syntax\n\n",
+    "stderr": ""
+  },
+  {
+    "backend": "loki",
+    "exit_code": 0,
+    "stdout": "",
+    "stderr": "level=info ts=2026-10-13T00:56:31.787696432Z caller=main.go:87 msg=\"config is valid\"\n"
+  }
+]

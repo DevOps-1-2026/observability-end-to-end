@@ -1,0 +1,471 @@
+{
+  "terraform": {
+    "required_version": ">= 1.10, < 2.0",
+    "required_providers": {
+      "google": {
+        "source": "hashicorp/google",
+        "version": "~> 7.0"
+      },
+      "random": {
+        "source": "hashicorp/random",
+        "version": "~> 3.7"
+      }
+    }
+  },
+  "provider": {
+    "google": {
+      "project": "${var.project_id}",
+      "region": "${var.region}"
+    }
+  },
+  "variable": {
+    "project_id": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string",
+      "default": "us-central1"
+    },
+    "name": {
+      "type": "string",
+      "default": "otel-credit-lab"
+    },
+    "invoker_member": {
+      "type": "string",
+      "description": "IAM member user:email; never allUsers",
+      "validation": {
+        "condition": "${can(regex(\"^(user|serviceAccount):\",var.invoker_member))}",
+        "error_message": "Use an identified user or service account, never allUsers."
+      }
+    },
+    "images": {
+      "type": "map(string)",
+      "description": "api,collector,prometheus,loki,grafana,gateway image URLs"
+    }
+  },
+  "resource": {
+    "google_project_service": {
+      "apis": {
+        "for_each": "${toset([\"run.googleapis.com\", \"sqladmin.googleapis.com\", \"secretmanager.googleapis.com\", \"artifactregistry.googleapis.com\", \"iam.googleapis.com\"])}",
+        "service": "${each.key}",
+        "disable_on_destroy": false
+      }
+    },
+    "google_service_account": {
+      "lab": {
+        "account_id": "${var.name}",
+        "display_name": "OTel credit lab",
+        "depends_on": [
+          "google_project_service.apis"
+        ]
+      }
+    },
+    "google_project_iam_member": {
+      "sql": {
+        "project": "${var.project_id}",
+        "role": "roles/cloudsql.client",
+        "member": "serviceAccount:${google_service_account.lab.email}"
+      }
+    },
+    "google_artifact_registry_repository": {
+      "lab": {
+        "location": "${var.region}",
+        "repository_id": "${var.name}",
+        "format": "DOCKER",
+        "depends_on": [
+          "google_project_service.apis"
+        ]
+      }
+    },
+    "random_password": {
+      "db": {
+        "length": 24,
+        "special": false
+      },
+      "grafana": {
+        "length": 24,
+        "special": false
+      }
+    },
+    "google_sql_database_instance": {
+      "lab": {
+        "name": "${var.name}-db",
+        "region": "${var.region}",
+        "database_version": "POSTGRES_16",
+        "deletion_protection": false,
+        "settings": {
+          "tier": "db-f1-micro",
+          "disk_size": 10,
+          "disk_type": "PD_SSD",
+          "disk_autoresize": false,
+          "availability_type": "ZONAL",
+          "ip_configuration": {
+            "ipv4_enabled": true
+          },
+          "backup_configuration": {
+            "enabled": false
+          }
+        },
+        "depends_on": [
+          "google_project_service.apis"
+        ]
+      }
+    },
+    "google_sql_database": {
+      "credits": {
+        "name": "credits",
+        "instance": "${google_sql_database_instance.lab.name}"
+      }
+    },
+    "google_sql_user": {
+      "lab": {
+        "name": "lab",
+        "instance": "${google_sql_database_instance.lab.name}",
+        "password": "${random_password.db.result}"
+      }
+    },
+    "google_secret_manager_secret": {
+      "db": {
+        "secret_id": "${var.name}-db",
+        "replication": {
+          "auto": {}
+        },
+        "depends_on": [
+          "google_project_service.apis"
+        ]
+      },
+      "grafana": {
+        "secret_id": "${var.name}-grafana",
+        "replication": {
+          "auto": {}
+        },
+        "depends_on": [
+          "google_project_service.apis"
+        ]
+      }
+    },
+    "google_secret_manager_secret_version": {
+      "db": {
+        "secret": "${google_secret_manager_secret.db.id}",
+        "secret_data": "${random_password.db.result}"
+      },
+      "grafana": {
+        "secret": "${google_secret_manager_secret.grafana.id}",
+        "secret_data": "${random_password.grafana.result}"
+      }
+    },
+    "google_secret_manager_secret_iam_member": {
+      "db": {
+        "secret_id": "${google_secret_manager_secret.db.id}",
+        "role": "roles/secretmanager.secretAccessor",
+        "member": "serviceAccount:${google_service_account.lab.email}"
+      },
+      "grafana": {
+        "secret_id": "${google_secret_manager_secret.grafana.id}",
+        "role": "roles/secretmanager.secretAccessor",
+        "member": "serviceAccount:${google_service_account.lab.email}"
+      }
+    },
+    "google_cloud_run_v2_service": {
+      "lab": {
+        "name": "${var.name}",
+        "location": "${var.region}",
+        "deletion_protection": false,
+        "ingress": "INGRESS_TRAFFIC_ALL",
+        "template": {
+          "service_account": "${google_service_account.lab.email}",
+          "execution_environment": "EXECUTION_ENVIRONMENT_GEN2",
+          "scaling": {
+            "min_instance_count": 1,
+            "max_instance_count": 1
+          },
+          "max_instance_request_concurrency": 80,
+          "timeout": "300s",
+          "volumes": {
+            "name": "cloudsql",
+            "cloud_sql_instance": {
+              "instances": [
+                "${google_sql_database_instance.lab.connection_name}"
+              ]
+            }
+          },
+          "containers": [
+            {
+              "name": "gateway",
+              "image": "${var.images[\"gateway\"]}",
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "512Mi"
+                },
+                "cpu_idle": false
+              },
+              "ports": {
+                "container_port": 8080
+              },
+              "depends_on": [
+                "service-a"
+              ],
+              "startup_probe": {
+                "tcp_socket": {
+                  "port": 8080
+                },
+                "period_seconds": 2,
+                "failure_threshold": 60
+              },
+              "env": []
+            },
+            {
+              "name": "service-a",
+              "image": "${var.images[\"api\"]}",
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "512Mi"
+                },
+                "cpu_idle": false
+              },
+              "command": [
+                "uvicorn"
+              ],
+              "args": [
+                "app.main:app",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "8000"
+              ],
+              "startup_probe": {
+                "http_get": {
+                  "path": "/health",
+                  "port": 8000
+                },
+                "period_seconds": 2,
+                "failure_threshold": 60,
+                "timeout_seconds": 2
+              },
+              "depends_on": [
+                "service-b",
+                "collector"
+              ],
+              "env": [
+                {
+                  "name": "OTEL_ENABLED",
+                  "value": "true"
+                },
+                {
+                  "name": "OTEL_SERVICE_NAME",
+                  "value": "service-a"
+                },
+                {
+                  "name": "OTEL_EXPORTER_OTLP_ENDPOINT",
+                  "value": "http://127.0.0.1:4318"
+                },
+                {
+                  "name": "SERVICE_B_URL",
+                  "value": "http://127.0.0.1:8001"
+                }
+              ]
+            },
+            {
+              "name": "service-b",
+              "image": "${var.images[\"api\"]}",
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "512Mi"
+                },
+                "cpu_idle": false
+              },
+              "command": [
+                "uvicorn"
+              ],
+              "args": [
+                "app.storage:app",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "8001"
+              ],
+              "startup_probe": {
+                "http_get": {
+                  "path": "/health",
+                  "port": 8001
+                },
+                "period_seconds": 2,
+                "failure_threshold": 60,
+                "timeout_seconds": 2
+              },
+              "volume_mounts": {
+                "name": "cloudsql",
+                "mount_path": "/cloudsql"
+              },
+              "env": [
+                {
+                  "name": "DATABASE_PASSWORD",
+                  "value_source": {
+                    "secret_key_ref": {
+                      "secret": "${google_secret_manager_secret.db.secret_id}",
+                      "version": "${google_secret_manager_secret_version.db.version}"
+                    }
+                  }
+                },
+                {
+                  "name": "OTEL_ENABLED",
+                  "value": "true"
+                },
+                {
+                  "name": "OTEL_SERVICE_NAME",
+                  "value": "service-b"
+                },
+                {
+                  "name": "OTEL_EXPORTER_OTLP_ENDPOINT",
+                  "value": "http://127.0.0.1:4318"
+                },
+                {
+                  "name": "DATABASE_SOCKET",
+                  "value": "/cloudsql/${google_sql_database_instance.lab.connection_name}"
+                },
+                {
+                  "name": "DATABASE_NAME",
+                  "value": "credits"
+                },
+                {
+                  "name": "DATABASE_USER",
+                  "value": "lab"
+                }
+              ]
+            },
+            {
+              "name": "collector",
+              "image": "${var.images[\"collector\"]}",
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "512Mi"
+                },
+                "cpu_idle": false
+              },
+              "startup_probe": {
+                "http_get": {
+                  "path": "/",
+                  "port": 13133
+                },
+                "period_seconds": 2,
+                "failure_threshold": 60
+              },
+              "env": []
+            },
+            {
+              "name": "jaeger",
+              "image": "jaegertracing/all-in-one:1.64.0",
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "512Mi"
+                },
+                "cpu_idle": false
+              },
+              "env": [
+                {
+                  "name": "COLLECTOR_OTLP_ENABLED",
+                  "value": "true"
+                },
+                {
+                  "name": "QUERY_BASE_PATH",
+                  "value": "/jaeger"
+                }
+              ],
+              "args": [
+                "--collector.otlp.grpc.host-port=0.0.0.0:14317",
+                "--collector.otlp.http.host-port=0.0.0.0:14318"
+              ]
+            },
+            {
+              "name": "prometheus",
+              "image": "${var.images[\"prometheus\"]}",
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "512Mi"
+                },
+                "cpu_idle": false
+              },
+              "env": []
+            },
+            {
+              "name": "loki",
+              "image": "${var.images[\"loki\"]}",
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "512Mi"
+                },
+                "cpu_idle": false
+              },
+              "env": []
+            },
+            {
+              "name": "grafana",
+              "image": "${var.images[\"grafana\"]}",
+              "resources": {
+                "limits": {
+                  "cpu": "1",
+                  "memory": "512Mi"
+                },
+                "cpu_idle": false
+              },
+              "env": [
+                {
+                  "name": "GF_SECURITY_ADMIN_PASSWORD",
+                  "value_source": {
+                    "secret_key_ref": {
+                      "secret": "${google_secret_manager_secret.grafana.secret_id}",
+                      "version": "${google_secret_manager_secret_version.grafana.version}"
+                    }
+                  }
+                },
+                {
+                  "name": "GF_SECURITY_ADMIN_USER",
+                  "value": "lab"
+                },
+                {
+                  "name": "GF_SERVER_ROOT_URL",
+                  "value": "%(protocol)s://%(domain)s/grafana/"
+                },
+                {
+                  "name": "GF_SERVER_SERVE_FROM_SUB_PATH",
+                  "value": "true"
+                }
+              ]
+            }
+          ]
+        },
+        "depends_on": [
+          "google_project_iam_member.sql",
+          "google_secret_manager_secret_iam_member.db",
+          "google_secret_manager_secret_iam_member.grafana",
+          "google_sql_user.lab",
+          "google_sql_database.credits"
+        ]
+      }
+    },
+    "google_cloud_run_v2_service_iam_member": {
+      "invoke": {
+        "project": "${var.project_id}",
+        "location": "${var.region}",
+        "name": "${google_cloud_run_v2_service.lab.name}",
+        "role": "roles/run.invoker",
+        "member": "${var.invoker_member}"
+      }
+    }
+  },
+  "output": {
+    "url": {
+      "value": "${google_cloud_run_v2_service.lab.uri}"
+    },
+    "repository": {
+      "value": "${google_artifact_registry_repository.lab.name}"
+    }
+  }
+}

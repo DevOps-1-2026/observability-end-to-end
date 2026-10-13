@@ -1,0 +1,7 @@
+{
+  "status": 503,
+  "body": {
+    "detail": "Credit storage unavailable"
+  },
+  "trace_id": "47176c0708a643c79801ac3fb599cc6c"
+}

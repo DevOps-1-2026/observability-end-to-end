@@ -1,0 +1,91 @@
+﻿{
+  "format_version": "1.0",
+  "valid": false,
+  "error_count": 3,
+  "warning_count": 0,
+  "diagnostics": [
+    {
+      "severity": "error",
+      "summary": "Incorrect attribute value type",
+      "detail": "Inappropriate value for attribute \"egress\": element 0: attributes \"description\", \"ipv6_cidr_blocks\", \"prefix_list_ids\", \"security_groups\", and \"self\" are required.",
+      "range": {
+        "filename": "main.tf.json",
+        "start": {
+          "line": 359,
+          "column": 19,
+          "byte": 9803
+        },
+        "end": {
+          "line": 368,
+          "column": 10,
+          "byte": 10000
+        }
+      },
+      "snippet": {
+        "context": "resource.aws_security_group.task",
+        "code": "        \"egress\": [\n          {\n            \"from_port\": 0,\n            \"to_port\": 0,\n            \"protocol\": \"-1\",\n            \"cidr_blocks\": [\n              \"0.0.0.0/0\"\n            ]\n          }\n        ]",
+        "start_line": 359,
+        "highlight_start_offset": 18,
+        "highlight_end_offset": 206,
+        "values": []
+      }
+    },
+    {
+      "severity": "error",
+      "summary": "Incorrect attribute value type",
+      "detail": "Inappropriate value for attribute \"ingress\": element 0: attributes \"description\", \"ipv6_cidr_blocks\", \"prefix_list_ids\", \"security_groups\", and \"self\" are required.",
+      "range": {
+        "filename": "main.tf.json",
+        "start": {
+          "line": 349,
+          "column": 20,
+          "byte": 9568
+        },
+        "end": {
+          "line": 358,
+          "column": 10,
+          "byte": 9782
+        }
+      },
+      "snippet": {
+        "context": "resource.aws_security_group.task",
+        "code": "        \"ingress\": [\n          {\n            \"from_port\": 8080,\n            \"to_port\": 8080,\n            \"protocol\": \"tcp\",\n            \"cidr_blocks\": [\n              \"${var.allowed_cidr}\"\n            ]\n          }\n        ],",
+        "start_line": 349,
+        "highlight_start_offset": 19,
+        "highlight_end_offset": 225,
+        "values": [
+          {
+            "traversal": "var.allowed_cidr",
+            "statement": "is a string"
+          }
+        ]
+      }
+    },
+    {
+      "severity": "error",
+      "summary": "Incorrect attribute value type",
+      "detail": "Inappropriate value for attribute \"route\": element 0: attributes \"carrier_gateway_id\", \"core_network_arn\", \"destination_prefix_list_id\", \"egress_only_gateway_id\", \"ipv6_cidr_block\", \"local_gateway_id\", \"nat_gateway_id\", \"network_interface_id\", \"odb_network_arn\", \"transit_gateway_id\", \"vpc_endpoint_id\", and \"vpc_peering_connection_id\" are required.",
+      "range": {
+        "filename": "main.tf.json",
+        "start": {
+          "line": 331,
+          "column": 18,
+          "byte": 9088
+        },
+        "end": {
+          "line": 336,
+          "column": 10,
+          "byte": 9226
+        }
+      },
+      "snippet": {
+        "context": "resource.aws_route_table.public",
+        "code": "        \"route\": [\n          {\n            \"cidr_block\": \"0.0.0.0/0\",\n            \"gateway_id\": \"${aws_internet_gateway.lab.id}\"\n          }\n        ]",
+        "start_line": 331,
+        "highlight_start_offset": 17,
+        "highlight_end_offset": 150,
+        "values": []
+      }
+    }
+  ]
+}

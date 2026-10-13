@@ -1,0 +1,27 @@
+{
+  "without-otel": {
+    "p95_ms": 405.65521144999997,
+    "p99_ms": 680.3928734099969,
+    "error_rate": 0,
+    "checks_rate": 1,
+    "p95_lt_500": true,
+    "p99_lt_1000": true,
+    "errors_lt_0_005": true,
+    "checks_ge_0_995": true
+  },
+  "with-otel": {
+    "p95_ms": 988.3525334999999,
+    "p99_ms": 2026.9553384999972,
+    "error_rate": 0,
+    "checks_rate": 1,
+    "p95_lt_500": false,
+    "p99_lt_1000": false,
+    "errors_lt_0_005": true,
+    "checks_ge_0_995": true
+  },
+  "cpu": {
+    "observed_overhead_percent": 15.417020602185797,
+    "reference_goal_lt_5": false
+  },
+  "scope": "Retrospective assessment of saved five-minute paired benchmark; no new benchmark executed. Reference objectives, not universal industry guarantees."
+}

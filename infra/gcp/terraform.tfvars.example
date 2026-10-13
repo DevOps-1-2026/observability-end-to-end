@@ -1,0 +1,11 @@
+project_id = "YOUR_PROJECT"
+region = "us-central1"
+invoker_member = "user:YOUR_EMAIL"
+images = {
+  api = "us-central1-docker.pkg.dev/YOUR_PROJECT/otel-credit-lab/api:REVISION"
+  collector = "us-central1-docker.pkg.dev/YOUR_PROJECT/otel-credit-lab/collector:REVISION"
+  prometheus = "us-central1-docker.pkg.dev/YOUR_PROJECT/otel-credit-lab/prometheus:REVISION"
+  loki = "us-central1-docker.pkg.dev/YOUR_PROJECT/otel-credit-lab/loki:REVISION"
+  grafana = "us-central1-docker.pkg.dev/YOUR_PROJECT/otel-credit-lab/grafana:REVISION"
+  gateway = "us-central1-docker.pkg.dev/YOUR_PROJECT/otel-credit-lab/gateway:REVISION"
+}

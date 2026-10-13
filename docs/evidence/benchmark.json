@@ -1,0 +1,75 @@
+{
+  "without-otel": {
+    "started_utc": "2026-10-13T00:57:14.666946+00:00",
+    "ended_utc": "2026-10-13T01:02:46.511112+00:00",
+    "p99_ms": 680.3928734099969,
+    "requests": 24784,
+    "failed_rate": 0,
+    "resources": {
+      "service-a": {
+        "samples": 66,
+        "cpu_mean_percent": 67.07363636363637,
+        "memory_mean_mib": 85.21454545454546
+      },
+      "service-b": {
+        "samples": 66,
+        "cpu_mean_percent": 76.67090909090909,
+        "memory_mean_mib": 88.03424242424242
+      },
+      "collector": {
+        "samples": 66,
+        "cpu_mean_percent": 0.38333333333333336,
+        "memory_mean_mib": 77.85409090909091
+      }
+    }
+  },
+  "with-otel": {
+    "started_utc": "2026-10-13T01:03:31.010348+00:00",
+    "ended_utc": "2026-10-13T01:09:06.838792+00:00",
+    "p99_ms": 2026.9553384999972,
+    "requests": 16396,
+    "failed_rate": 0,
+    "resources": {
+      "service-a": {
+        "samples": 67,
+        "cpu_mean_percent": 71.12507462686567,
+        "memory_mean_mib": 95.4623880597015
+      },
+      "service-b": {
+        "samples": 67,
+        "cpu_mean_percent": 94.78059701492538,
+        "memory_mean_mib": 103.56955223880597
+      },
+      "collector": {
+        "samples": 67,
+        "cpu_mean_percent": 1.9749253731343284,
+        "memory_mean_mib": 94.13940298507463
+      }
+    }
+  },
+  "comparison": {
+    "p99_ms": {
+      "absolute": 1346.5624650900004,
+      "percent": 197.90954869078666
+    },
+    "apps_cpu_percent": {
+      "absolute": 22.1611261872456,
+      "percent": 15.417020602185797
+    },
+    "apps_memory_mib": {
+      "absolute": 25.783152419719585,
+      "percent": 14.882154579781856
+    }
+  },
+  "conditions": {
+    "vus": 50,
+    "duration": "5m per mode",
+    "warmup": "20s per mode",
+    "pairs": 1,
+    "seed_id": "7c41eb88-29dc-4d26-b410-f8355ac6bc03",
+    "collector": "running in both modes; baseline receives no application OTLP",
+    "app_limits": "each 1 CPU / 512 MiB",
+    "resource_sampling": "docker stats every ~5s, mean per service",
+    "limitations": "single ordered pair; no statistical significance; other local containers remain active"
+  }
+}

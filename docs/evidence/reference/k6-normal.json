@@ -1,0 +1,149 @@
+{
+    "root_group": {
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "expected 200": {
+                    "passes": 368,
+                    "fails": 0,
+                    "name": "expected 200",
+                    "path": "::expected 200",
+                    "id": "dff69a8eb20d74355486c95da513beca"
+                }
+            },
+        "name": "",
+        "path": ""
+    },
+    "metrics": {
+        "http_req_receiving": {
+            "p(95)": 2.0052532999999997,
+            "p(99)": 5.115110100000046,
+            "max": 70.146248,
+            "avg": 1.0505111560846563,
+            "med": 0.6495975
+        },
+        "iterations": {
+            "count": 184,
+            "rate": 7.728388148294214
+        },
+        "checks": {
+            "passes": 368,
+            "fails": 0,
+            "thresholds": {
+                "rate>0.995": false
+            },
+            "value": 1
+        },
+        "http_req_tls_handshaking": {
+            "avg": 0,
+            "med": 0,
+            "p(95)": 0,
+            "p(99)": 0,
+            "max": 0
+        },
+        "data_sent": {
+            "count": 67158,
+            "rate": 2820.7776699083847
+        },
+        "http_req_waiting": {
+            "avg": 73.20688838624343,
+            "med": 29.5447625,
+            "p(95)": 197.3168548499999,
+            "p(99)": 1240.219413200001,
+            "max": 1579.997485
+        },
+        "http_req_sending": {
+            "p(99)": 0.40153403000000026,
+            "max": 0.494661,
+            "avg": 0.08081321957671957,
+            "med": 0.0678265,
+            "p(95)": 0.2041568999999999
+        },
+        "unexpected_responses": {
+            "count": 0,
+            "rate": 0,
+            "thresholds": {
+                "count==0": false
+            }
+        },
+        "iteration_duration": {
+            "med": 1071.722198,
+            "p(95)": 1317.2278338,
+            "p(99)": 1414.47730846,
+            "max": 1432.273359,
+            "avg": 1113.4075061195656
+        },
+        "http_req_connecting": {
+            "avg": 0.013807719576719574,
+            "med": 0,
+            "p(95)": 0,
+            "p(99)": 0.49754304000000044,
+            "max": 0.849472
+        },
+        "vus_max": {
+            "value": 10,
+            "min": 10,
+            "max": 10
+        },
+        "http_req_duration{expected_response:true}": {
+            "avg": 74.33821276190476,
+            "med": 30.187718,
+            "p(95)": 201.15455984999994,
+            "p(99)": 1241.045999000001,
+            "max": 1580.668961
+        },
+        "data_received": {
+            "count": 110028,
+            "rate": 4621.408104241934
+        },
+        "http_reqs": {
+            "count": 378,
+            "rate": 15.876797391604418
+        },
+        "http_req_blocked": {
+            "p(95)": 0.05876759999999998,
+            "p(99)": 0.6587971400000004,
+            "max": 2.377023,
+            "avg": 0.037117116402116436,
+            "med": 0.0100405
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 378,
+            "thresholds": {
+                "rate<0.005": false
+            },
+            "value": 0
+        },
+        "http_req_duration": {
+            "avg": 74.33821276190476,
+            "med": 30.187718,
+            "p(95)": 201.15455984999994,
+            "p(99)": 1241.045999000001,
+            "max": 1580.668961,
+            "thresholds": {
+                "p(95)<500": false,
+                "p(99)<1000": true
+            }
+        },
+        "vus": {
+            "value": 4,
+            "min": 4,
+            "max": 10
+        }
+    },
+    "setup_data": {
+        "ids": [
+            "13ebe756-6407-4383-92a8-03f7aaaea52e",
+            "8bb458fd-c418-4bda-b8a2-e24e53235561",
+            "2ae20e36-802a-49d5-bd20-644dd6eac477",
+            "9ac88034-d5ff-4da8-80e6-2b89881a5dab",
+            "4e3ec3af-f830-4d5e-9bb7-27bd7dc983b1",
+            "b7318607-ed1b-4163-a062-ad4df0f236e3",
+            "d0d0ba29-8ed6-4db2-8dc2-f1506ca60c8b",
+            "e7e2e3b7-be8e-43b2-8ab4-082f77760ad7",
+            "2ca7b957-8b56-4ff3-9134-c895ef664beb",
+            "6df103cf-c11b-4058-a0e0-9e48c47ba448"
+        ]
+    }
+}

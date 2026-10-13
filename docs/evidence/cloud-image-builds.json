@@ -1,0 +1,22 @@
+{
+  "collector": {
+    "tag": "otel-credit-collector:local",
+    "id": "sha256:88d0bcb5d7360761ae8078842eb1634c392a5043da5b84721f2832ee6eeb8ad9"
+  },
+  "prometheus": {
+    "tag": "otel-credit-prometheus:local",
+    "id": "sha256:02ca7752a2b007e84c93caa34c7b126bf99c19cb69f45dae2bb19e005ffb1c0e"
+  },
+  "loki": {
+    "tag": "otel-credit-loki:local",
+    "id": "sha256:efc9067c023d2a31dbbfa4266e5f41b5a5658e9b70cd49dc23d19bdaafca33ff"
+  },
+  "grafana": {
+    "tag": "otel-credit-grafana:local",
+    "id": "sha256:1867ff54e030ebdf4d23443925ec485213ef13049e5a2263a5dd68f9f27f8077"
+  },
+  "gateway": {
+    "tag": "otel-credit-gateway:local",
+    "id": "sha256:18d9f21777cb2d3eaef1112db3a085b8c8b7cb491672adfec65fc472d795ec0a"
+  }
+}

@@ -1,0 +1,152 @@
+{
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {},
+        "checks": {
+                "expected 404": {
+                    "name": "expected 404",
+                    "path": "::expected 404",
+                    "id": "5b1cc68109a528208d58536c3caa4bf0",
+                    "passes": 183,
+                    "fails": 0
+                },
+                "expected 422": {
+                    "id": "2a345f7afd91e76875f8c68394c4808a",
+                    "passes": 183,
+                    "fails": 0,
+                    "name": "expected 422",
+                    "path": "::expected 422"
+                }
+            }
+    },
+    "metrics": {
+        "http_req_duration{expected_response:true}": {
+            "avg": 58.598294829787314,
+            "med": 15.5552165,
+            "p(95)": 148.3141695,
+            "p(99)": 1105.7942377499999,
+            "max": 1126.951904
+        },
+        "iteration_duration": {
+            "med": 1027.121612,
+            "p(95)": 1996.9764182000017,
+            "p(99)": 2145.57567668,
+            "max": 2151.582486,
+            "avg": 1120.6000331366117
+        },
+        "http_reqs": {
+            "count": 376,
+            "rate": 15.775653819502358
+        },
+        "http_req_tls_handshaking": {
+            "p(95)": 0,
+            "p(99)": 0,
+            "max": 0,
+            "avg": 0,
+            "med": 0
+        },
+        "http_req_receiving": {
+            "avg": 0.9702885930851073,
+            "med": 0.679397,
+            "p(95)": 2.063853,
+            "p(99)": 3.30996575,
+            "max": 47.990399
+        },
+        "vus": {
+            "value": 2,
+            "min": 2,
+            "max": 10
+        },
+        "checks": {
+            "passes": 366,
+            "fails": 0,
+            "thresholds": {
+                "rate>0.995": false
+            },
+            "value": 1
+        },
+        "data_received": {
+            "count": 86032,
+            "rate": 3609.6038547857097
+        },
+        "iterations": {
+            "count": 183,
+            "rate": 7.67804427917269
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 376,
+            "thresholds": {
+                "rate<0.005": false
+            },
+            "value": 0
+        },
+        "vus_max": {
+            "value": 10,
+            "min": 10,
+            "max": 10
+        },
+        "http_req_blocked": {
+            "med": 0.0099065,
+            "p(95)": 0.0392875,
+            "p(99)": 1.15260425,
+            "max": 3.403407,
+            "avg": 0.04343420744680851
+        },
+        "http_req_sending": {
+            "p(95)": 0.188365,
+            "p(99)": 0.3923485,
+            "max": 1.516355,
+            "avg": 0.0910581542553191,
+            "med": 0.0731495
+        },
+        "http_req_waiting": {
+            "med": 14.8905675,
+            "p(95)": 147.54247650000002,
+            "p(99)": 1104.6058010000002,
+            "max": 1126.138568,
+            "avg": 57.53694808244676
+        },
+        "data_sent": {
+            "count": 65525,
+            "rate": 2749.201373731096
+        },
+        "http_req_duration": {
+            "med": 15.5552165,
+            "p(95)": 148.3141695,
+            "p(99)": 1105.7942377499999,
+            "max": 1126.951904,
+            "avg": 58.598294829787314
+        },
+        "unexpected_responses": {
+            "count": 0,
+            "rate": 0,
+            "thresholds": {
+                "count==0": false
+            }
+        },
+        "http_req_connecting": {
+            "p(95)": 0,
+            "p(99)": 0.6471235,
+            "max": 1.083477,
+            "avg": 0.017960797872340426,
+            "med": 0
+        }
+    },
+    "setup_data": {
+        "ids": [
+            "adaf367c-15b5-4dbb-93ce-f7ff430cb7cc",
+            "48f63d42-48b6-423e-bbc5-c485a45b5228",
+            "b5072177-cdb9-4eca-b745-167920f67f2d",
+            "201525be-ce1f-4741-a3b7-4c66762a2b32",
+            "4cc4317e-729f-4bfc-99ab-b6620bc7eade",
+            "86b85b03-2ad3-490a-ac83-7e4095689e8e",
+            "a5cfe96e-713e-4182-95e3-17103af366cd",
+            "694f68cd-3ce8-4cb8-9438-725e1e61188e",
+            "8b8b06de-2ccc-4219-b5f1-80ccca21f968",
+            "b02c1da2-08a7-40e5-9dae-7b7820ce04a3"
+        ]
+    }
+}

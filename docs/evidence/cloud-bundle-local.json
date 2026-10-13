@@ -1,0 +1,114 @@
+{
+  "scope": "local Docker only; not a cloud deployment",
+  "trace_id": "48544924aaaaaaaaaaaaaaaaaaaaaaaa",
+  "services": [
+    "service-a-cloud-smoke",
+    "service-b-cloud-smoke"
+  ],
+  "targets": {
+    "status": "success",
+    "data": {
+      "activeTargets": [
+        {
+          "discoveredLabels": {
+            "__address__": "127.0.0.1:8000",
+            "__metrics_path__": "/metrics",
+            "__scheme__": "http",
+            "__scrape_interval__": "5s",
+            "__scrape_timeout__": "5s",
+            "job": "apps"
+          },
+          "labels": {
+            "instance": "127.0.0.1:8000",
+            "job": "apps"
+          },
+          "scrapePool": "apps",
+          "scrapeUrl": "http://127.0.0.1:8000/metrics",
+          "globalUrl": "http://:8000/metrics",
+          "lastError": "",
+          "lastScrape": "2026-10-13T01:13:03.043684469Z",
+          "lastScrapeDuration": 0.003481897,
+          "health": "up",
+          "scrapeInterval": "5s",
+          "scrapeTimeout": "5s"
+        },
+        {
+          "discoveredLabels": {
+            "__address__": "127.0.0.1:8001",
+            "__metrics_path__": "/metrics",
+            "__scheme__": "http",
+            "__scrape_interval__": "5s",
+            "__scrape_timeout__": "5s",
+            "job": "apps"
+          },
+          "labels": {
+            "instance": "127.0.0.1:8001",
+            "job": "apps"
+          },
+          "scrapePool": "apps",
+          "scrapeUrl": "http://127.0.0.1:8001/metrics",
+          "globalUrl": "http://:8001/metrics",
+          "lastError": "",
+          "lastScrape": "2026-10-13T01:13:01.889986965Z",
+          "lastScrapeDuration": 0.006362602,
+          "health": "up",
+          "scrapeInterval": "5s",
+          "scrapeTimeout": "5s"
+        },
+        {
+          "discoveredLabels": {
+            "__address__": "127.0.0.1:8888",
+            "__metrics_path__": "/metrics",
+            "__scheme__": "http",
+            "__scrape_interval__": "5s",
+            "__scrape_timeout__": "5s",
+            "job": "collector"
+          },
+          "labels": {
+            "instance": "127.0.0.1:8888",
+            "job": "collector"
+          },
+          "scrapePool": "collector",
+          "scrapeUrl": "http://127.0.0.1:8888/metrics",
+          "globalUrl": "http://:8888/metrics",
+          "lastError": "",
+          "lastScrape": "2026-10-13T01:13:01.357710885Z",
+          "lastScrapeDuration": 0.004233858,
+          "health": "up",
+          "scrapeInterval": "5s",
+          "scrapeTimeout": "5s"
+        },
+        {
+          "discoveredLabels": {
+            "__address__": "127.0.0.1:8889",
+            "__metrics_path__": "/metrics",
+            "__scheme__": "http",
+            "__scrape_interval__": "5s",
+            "__scrape_timeout__": "5s",
+            "job": "otel-apps"
+          },
+          "labels": {
+            "instance": "127.0.0.1:8889",
+            "job": "otel-apps"
+          },
+          "scrapePool": "otel-apps",
+          "scrapeUrl": "http://127.0.0.1:8889/metrics",
+          "globalUrl": "http://:8889/metrics",
+          "lastError": "",
+          "lastScrape": "2026-10-13T01:13:03.27135641Z",
+          "lastScrapeDuration": 0.002538796,
+          "health": "up",
+          "scrapeInterval": "5s",
+          "scrapeTimeout": "5s"
+        }
+      ],
+      "droppedTargets": [],
+      "droppedTargetCounts": {
+        "apps": 0,
+        "collector": 0,
+        "otel-apps": 0
+      }
+    }
+  },
+  "grafana_panels": 6
+}

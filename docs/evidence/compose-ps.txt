@@ -1,0 +1,9 @@
+NAME                           IMAGE                                          COMMAND                  SERVICE      CREATED          STATUS                    PORTS
+otel-credit-lab-collector-1    otel/opentelemetry-collector-contrib:0.139.0   "/otelcol-contrib --â€¦"   collector    55 minutes ago   Up 54 minutes             127.0.0.1:14317->4317/tcp, 127.0.0.1:14318->4318/tcp
+otel-credit-lab-grafana-1      grafana/grafana:11.6.0                         "/run.sh"                grafana      55 minutes ago   Up 4 minutes              127.0.0.1:13000->3000/tcp
+otel-credit-lab-jaeger-1       jaegertracing/all-in-one:1.64.0                "/go/bin/all-in-one-â€¦"   jaeger       55 minutes ago   Up 55 minutes             127.0.0.1:16686->16686/tcp
+otel-credit-lab-loki-1         grafana/loki:3.4.2                             "/usr/bin/loki -confâ€¦"   loki         55 minutes ago   Up 55 minutes             3100/tcp
+otel-credit-lab-postgres-1     postgres:16.6-alpine                           "docker-entrypoint.sâ€¦"   postgres     55 minutes ago   Up 55 minutes (healthy)   5432/tcp
+otel-credit-lab-prometheus-1   prom/prometheus:v3.2.1                         "/bin/prometheus --câ€¦"   prometheus   55 minutes ago   Up 55 minutes             127.0.0.1:19090->9090/tcp
+otel-credit-lab-service-a-1    otel-credit-api:local                          "uvicorn app.main:apâ€¦"   service-a    19 minutes ago   Up 19 minutes (healthy)   127.0.0.1:18000->8000/tcp
+otel-credit-lab-service-b-1    otel-credit-api:local                          "uvicorn app.storageâ€¦"   service-b    19 minutes ago   Up 19 minutes (healthy)   8000/tcp

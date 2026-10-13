@@ -1,0 +1,38 @@
+[
+  {
+    "mode": "normal",
+    "exit_code": 99,
+    "vus": 10,
+    "peak_vus": 10,
+    "configured_duration": "20s",
+    "requests": 378,
+    "p99_ms": 1241.045999000001,
+    "http_failed_rate": 0,
+    "all_expected_statuses": true,
+    "scope": "functional smoke; no CPU/memory benchmark or statistical SLO conclusion"
+  },
+  {
+    "mode": "errors",
+    "exit_code": 0,
+    "vus": 10,
+    "peak_vus": 10,
+    "configured_duration": "20s",
+    "requests": 376,
+    "p99_ms": 1105.7942377499999,
+    "http_failed_rate": 0,
+    "all_expected_statuses": true,
+    "scope": "functional smoke; no CPU/memory benchmark or statistical SLO conclusion"
+  },
+  {
+    "mode": "spike",
+    "exit_code": 0,
+    "vus": 10,
+    "peak_vus": 20,
+    "configured_duration": "30s ramp/hold/ramp",
+    "requests": 922,
+    "p99_ms": 679.0203805599997,
+    "http_failed_rate": 0,
+    "all_expected_statuses": true,
+    "scope": "functional smoke; no CPU/memory benchmark or statistical SLO conclusion"
+  }
+]

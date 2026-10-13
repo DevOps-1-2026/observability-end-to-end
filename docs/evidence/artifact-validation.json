@@ -1,0 +1,29 @@
+{
+  "pdf_pages": 6,
+  "pdf_xref_valid": true,
+  "utf8_documents": true,
+  "cloud_dashboard_baked_matches": true,
+  "apps": [
+    {
+      "service": "service-a",
+      "healthy": true,
+      "otel_enabled": true,
+      "image_id": "sha256:facee429cde465afc261bd4e049f7506d7ef3bc73c1f9016599bae56431f5c96"
+    },
+    {
+      "service": "service-b",
+      "healthy": true,
+      "otel_enabled": true,
+      "image_id": "sha256:facee429cde465afc261bd4e049f7506d7ef3bc73c1f9016599bae56431f5c96"
+    }
+  ],
+  "pdf_body_lines_per_page": [
+    34,
+    33,
+    33,
+    30,
+    34,
+    40
+  ],
+  "pdf_sha256": "99afab7d57410140e0f6332c1b6c71d694c7b68a104b85a7d3f3a9256fd97378"
+}

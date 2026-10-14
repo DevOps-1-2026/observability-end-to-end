@@ -21,44 +21,62 @@ processors:
 
   batch:
     timeout: 1s
-    send_batch_size: 1024
-
-exporters:
-  awsxray:
-    region: us-east-2
-
-  awsemf:
-    region: us-east-2
-    namespace: OpenTelemetry/CreditLab
-    log_group_name: /ecs/otel-credit-lab/metrics
-    log_stream_name: otel-metrics
-    dimension_rollup_option: NoDimensionRollup
-    resource_to_telemetry_conversion:
-      enabled: true
-
-  debug:
-    verbosity: basic
+    send_batch_size: 512
 
 extensions:
   health_check:
     endpoint: "0.0.0.0:13133"
 
+  sigv4auth/traces:
+    region: us-east-2
+    service: xray
+
+  sigv4auth/metrics:
+    region: us-east-2
+    service: monitoring
+
+  sigv4auth/logs:
+    region: us-east-2
+    service: logs
+
+exporters:
+  otlphttp/traces:
+    endpoint: https://xray.us-east-2.amazonaws.com
+    auth:
+      authenticator: sigv4auth/traces
+
+  otlphttp/metrics:
+    endpoint: https://monitoring.us-east-2.amazonaws.com
+    auth:
+      authenticator: sigv4auth/metrics
+
+  otlphttp/logs:
+    endpoint: https://logs.us-east-2.amazonaws.com
+    headers:
+      x-aws-log-group: /ecs/otel-credit-lab/otel-logs
+      x-aws-log-stream: otel
+    auth:
+      authenticator: sigv4auth/logs
+
 service:
-  extensions: [health_check]
+  extensions:
+    - health_check
+    - sigv4auth/traces
+    - sigv4auth/metrics
+    - sigv4auth/logs
 
   pipelines:
     traces:
       receivers: [otlp]
       processors: [memory_limiter, resource, batch]
-      exporters: [awsxray, debug]
+      exporters: [otlphttp/traces]
 
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, resource, batch]
-      exporters: [awsemf, debug]
+      exporters: [otlphttp/metrics]
 
     logs:
       receivers: [otlp]
       processors: [memory_limiter, resource, batch]
-      exporters: [debug]
-
+      exporters: [otlphttp/logs]

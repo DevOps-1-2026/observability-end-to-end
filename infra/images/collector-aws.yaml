@@ -1,1 +1,64 @@
 
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317"
+      http:
+        endpoint: "0.0.0.0:4318"
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 384
+    spike_limit_mib: 96
+
+  resource:
+    attributes:
+      - key: lab.name
+        value: credit-lab
+        action: upsert
+
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+
+exporters:
+  awsxray:
+    region: us-east-2
+
+  awsemf:
+    region: us-east-2
+    namespace: OpenTelemetry/CreditLab
+    log_group_name: /ecs/otel-credit-lab/metrics
+    log_stream_name: otel-metrics
+    dimension_rollup_option: NoDimensionRollup
+    resource_to_telemetry_conversion:
+      enabled: true
+
+  debug:
+    verbosity: basic
+
+extensions:
+  health_check:
+    endpoint: "0.0.0.0:13133"
+
+service:
+  extensions: [health_check]
+
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [awsxray, debug]
+
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [awsemf, debug]
+
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, resource, batch]
+      exporters: [debug]
+

@@ -403,12 +403,16 @@
         "assume_role_policy": "{\"Version\": \"2012-10-17\", \"Statement\": [{\"Effect\": \"Allow\", \"Principal\": {\"Service\": \"ecs-tasks.amazonaws.com\"}, \"Action\": \"sts:AssumeRole\"}]}"
       }
     },
-    "aws_iam_role_policy_attachment": {
-      "execution": {
-        "role": "${aws_iam_role.execution.name}",
-        "policy_arn": "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-      }
-    },
+"aws_iam_role_policy_attachment": {
+  "execution": {
+    "role": "${aws_iam_role.execution.name}",
+    "policy_arn": "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  },
+  "task": {
+    "role": "${aws_iam_role.task.name}",
+    "policy_arn": "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  }
+},
     "aws_iam_role_policy": {
       "secrets": {
         "role": "${aws_iam_role.execution.id}",

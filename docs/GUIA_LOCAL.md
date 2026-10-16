@@ -10,7 +10,7 @@ El repositorio `observability-end-to-end` dispone de Git y de un README específ
 
 La guía y el estado se revisaron el 13 de octubre de 2026, America/Bogota. Se conserva el [índice de evidencias](evidence/README.md) con sus enlaces existentes; los resultados, JSON/CSV, capturas y manifiestos históricos no se modifican. Los comandos de validación y benchmark de esta guía son procedimientos de reproducción: no se ejecutaron durante esta preparación.
 
-`INFORME_LAB_OTEL.pdf` se conserva como borrador local y está excluido de Git, igual que el HTML anterior. El informe definitivo está siendo editado en Google Docs y todavía debe completar AWS y GCP. No se publica el PDF en esta etapa. La infraestructura de ambas nubes está preparada; los despliegues siguen pendientes de autorización.
+El [informe final PDF](INFORME_LAB_OTEL.pdf) y la [versión editable DOCX](INFORME_LAB_OTEL.docx) están preparados para la entrega. El HTML anterior sigue excluido de Git. La [implementación inicial AWS](IMPLEMENTACION_INICIAL_AWS.md) documenta seis repositorios ECR, dos imágenes publicadas y CloudWatch Logs preparado, sin confirmación de un despliegue en ECS ni recepción de las tres señales. GCP no se desplegó. Actualización documental: 15 de octubre de 2026; sin nuevas pruebas, commit, push ni ejecución de recursos cloud.
 
 La revisión opcional `scripts/assess_reference_slos.py` utiliza la ruta absoluta del ZIP registrada en el inventario histórico. Esa ruta corresponde al workspace anterior; no es un requisito del arranque local. Se conserva el registro original sin modificarlo.
 

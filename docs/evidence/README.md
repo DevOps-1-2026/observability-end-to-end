@@ -94,7 +94,7 @@ Se conserva una sola pareja final, ordenada sin→con, con crédito compartido y
 | [terraform-gcp-validate.json](terraform-gcp-validate.json) | Validación final GCP con `valid=true`, cero errores y cero advertencias. |
 | [errors/terraform-aws-rules.json](errors/terraform-aws-rules.json) | Fallo anterior de validación AWS con tres errores de tipos en reglas/rutas. Se conserva como historial; no sustituye el resultado final aprobado. |
 
-Estas evidencias validan esquema y expresiones localmente. No prueban cuotas, permisos efectivos, costos definitivos, arranque remoto ni Collector desplegado en AWS ECS Fargate o Google Cloud Run. Los despliegues permanecen pendientes de autorización.
+Estas evidencias validan esquema y expresiones localmente. No prueban cuotas, permisos efectivos, costos definitivos, arranque remoto ni Collector desplegado en AWS ECS Fargate o Google Cloud Run. Los avances iniciales de AWS se documentan por separado en [IMPLEMENTACION_INICIAL_AWS.md](../IMPLEMENTACION_INICIAL_AWS.md); no son resultados de estas validaciones Terraform.
 
 ### Preparación de imágenes y configuraciones cloud, probada localmente
 
@@ -117,10 +117,10 @@ Estas evidencias validan esquema y expresiones localmente. No prueban cuotas, pe
 ## Evidencias faltantes y límites de publicación
 
 - Las siete categorías solicitadas tienen evidencia local. No se encontró ningún archivo faltante entre los enlaces de este índice ni entre las entradas del manifiesto que apuntan dentro de esta carpeta.
-- No hay evidencias de despliegues reales ni benchmarks en AWS/GCP: siguen pendientes de autorización.
-- No existe un diagrama independiente de arquitectura en esta carpeta; la topología se respalda con el snapshot de servicios, la traza y las comprobaciones de integración.
+- La [documentación AWS y sus capturas](../IMPLEMENTACION_INICIAL_AWS.md) registran recursos iniciales, dos imágenes publicadas y diez pruebas en CloudShell. No acreditan aplicación/Collector funcionando en ECS ni recepción de métricas, logs y trazas. No hay despliegue GCP ni benchmarks cloud.
+- La Figura 1 fue actualizada con la [imagen proporcionada por el equipo](../ARQUITECTURA_OTEL.png) en el [informe PDF](../INFORME_LAB_OTEL.pdf) y en el [DOCX](../INFORME_LAB_OTEL.docx). En esta carpeta la topología se respalda con el snapshot de servicios, la traza y las comprobaciones de integración.
 - No se acredita navegación automatizada de exemplars ni una serie de múltiples parejas de benchmark para incertidumbre estadística.
 - El manifiesto SHA256 necesita conciliarse con dashboard-queries.json si se exige integridad de la versión final; se conservó intacto como evidencia histórica.
 - Se revisaron 60 archivos existentes: 27 JSON, nueve TXT, cuatro CSV, tres PNG, 15 logs y un documento de limitaciones, además del marcador .gitkeep. Los 15 archivos .log existen localmente pero están excluidos por las reglas actuales de Git; este índice enlaza los JSON/CSV y demás evidencias conservables en GitHub, sin enlaces a logs que quedarían ausentes al publicar. No se cambiaron las reglas de Git.
 
-La revisión fue documental. Solo se creó este README: no se movieron, duplicaron ni modificaron las evidencias; no se ejecutaron pruebas, benchmarks, commit, push o despliegues.
+La revisión y actualización del índice fueron documentales. Se actualizaron enlaces y el estado de nube; no se movieron, duplicaron ni modificaron archivos de evidencia, capturas o resultados. No se ejecutaron pruebas, benchmarks, commit, push ni despliegues.

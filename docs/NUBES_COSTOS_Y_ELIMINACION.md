@@ -1,6 +1,6 @@
 # AWS ECS Fargate y Google Cloud Run: preparación sin despliegue
 
-Estado: archivos de infraestructura preparados. Validación local Terraform en docs/evidence; ningún plan con cuentas, publicación de imágenes ni apply ejecutado. Tener una cuenta gratuita no garantiza que esta arquitectura sea gratuita. Las cuentas y créditos del usuario no fueron consultados.
+Estado actualizado al 15 de octubre de 2026: este documento describe la propuesta Terraform y el bundle preparados y validados localmente. Por separado, la [implementación inicial AWS](IMPLEMENTACION_INICIAL_AWS.md) documenta seis repositorios ECR creados, imágenes de API y Collector publicadas y CloudWatch Logs preparado en `us-east-2`, con siete días de retención. No se confirmó un despliegue en ECS ni el flujo de las tres señales. GCP no se desplegó. Las estimaciones históricas siguientes no son una cotización actual ni evidencia de recursos activos; las cuentas y créditos no se consultaron durante esta revisión.
 
 ## Diseño y límites
 
@@ -10,7 +10,7 @@ Las configuraciones cloud están horneadas en imágenes derivadas, evitando bind
 
 La telemetría cloud es efímera: trazas en memoria y datos Loki/Prometheus/Grafana en disco del contenedor. Exportar evidencias antes de terminar la sesión. No es una configuración de producción ni prueba de retención durable de señales.
 
-## Servicios que se crearían
+## Servicios previstos por la propuesta Terraform
 
 | AWS | Cantidad/configuración | Costos posibles |
 |---|---|---|
@@ -18,7 +18,7 @@ La telemetría cloud es efímera: trazas en memoria y datos Loki/Prometheus/Graf
 | VPC, 3 subnets, rutas, Internet Gateway y SG | 1 subnet pública ECS, 2 privadas RDS | IPv4 pública y transferencia; sin NAT ni ALB |
 | RDS PostgreSQL 16 | db.t4g.micro, single-AZ, 20 GiB gp3 | Instancia, disco, posible CPU burst; no asumir free tier |
 | ECR | 6 repositorios de imágenes | Almacenamiento, transferencias |
-| CloudWatch Logs | 1 grupo, retención 3 días | Ingesta y almacenamiento |
+| CloudWatch Logs | Propuesta Terraform: 1 grupo, retención 3 días; fase inicial AWS documentada por separado: grupo y flujo `otel`, retención 7 días | Ingesta y almacenamiento |
 | IAM | roles execution/task y política limitada | Sin tarifa directa por roles |
 | Secrets Manager | secreto maestro RDS administrado; Grafana externo | Almacenamiento de secretos y lecturas |
 
@@ -51,11 +51,11 @@ powershell -NoProfile -File scripts/validate_infra.ps1
 
 Terraform 1.13.3 en Docker descarga providers, ejecuta init -backend=false y validate. No autentica cuentas ni crea recursos. main.tf.json es formato Terraform JSON válido, no pseudocódigo. Se conservan .terraform.lock.hcl para fijar providers. Validate confirma esquema y expresiones, no disponibilidad regional, cuotas, permisos ni arranque real en las nubes.
 
-## Pasos pendientes, exclusivamente después de aprobación
+## Procedimiento de referencia para completar despliegues, sujeto a aprobación
 
 1. Confirmar proyecto/cuenta, región, límites de presupuesto, duración y CIDR. Revisar si el empaquetado de A/B satisface la guía original.
 2. Autenticar con identidad del usuario sin introducir llaves en el repositorio. Copiar terraform.tfvars.example a terraform.tfvars y ajustar referencias. Los valores de ejemplo no son desplegables.
-3. Aprobar un primer bootstrap de registries (y APIs GCP), construir imágenes localmente y publicar con tags inmutables. Un terraform apply -target para bootstrap es excepcional: revisar el plan completo de nuevo después, sin tratar el primer resultado como despliegue final.
+3. Revisar los repositorios e imágenes ya documentados en AWS antes de cualquier bootstrap adicional. Para GCP, aprobar registries/APIs, construir imágenes y publicar con tags inmutables. Un terraform apply -target para bootstrap es excepcional: revisar el plan completo de nuevo después, sin tratar el primer resultado como despliegue final.
 4. AWS exige un secreto externo para Grafana: crearlo o elegir uno con permiso explícito. El rol ECS puede leer ese ARN y el secreto maestro RDS. Si hay KMS personalizado añadir permisos mínimos específicos; no están incluidos.
 5. GCP requiere APIs habilitadas, Cloud SQL socket en /cloudsql y permisos Cloud SQL client/Secret accessor. Los secretos generados también aparecen en el estado Terraform: proteger y no compartir tfstate. IAM run.invoker se otorga solo a invoker_member.
 6. Construir API con Dockerfile y las otras imágenes con `docker build -f infra/images/NAME.Dockerfile -t REGISTRY/NAME:REVISION .`. No ejecutar push antes de autorización, porque escribe en una cuenta remota.
@@ -82,7 +82,7 @@ GCP:
 - Las APIs quedan habilitadas por disable_on_destroy=false: no se deshabilitan servicios compartidos. El proyecto existente tampoco se elimina. Revisar Cloud Logging, backups/snapshots y otros recursos creados manualmente.
 - Verificar la consola de facturación tras propagarse los cargos. Reducir min instances a cero no elimina Cloud SQL ni los discos/registries.
 
-No se ejecutó ninguno de estos pasos cloud.
+Esta guía documenta un procedimiento de referencia; no prueba su ejecución. Los avances parciales AWS se registran en IMPLEMENTACION_INICIAL_AWS.md. Esta actualización no ejecutó pasos cloud.
 
 ## Prueba adicional local de imágenes cloud
 

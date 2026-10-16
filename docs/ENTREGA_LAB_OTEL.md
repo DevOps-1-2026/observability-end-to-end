@@ -1,87 +1,147 @@
-# Informe del laboratorio OpenTelemetry
+# Laboratorio de observabilidad end-to-end con OpenTelemetry: validación local y trabajo realizado en AWS
 
-## 1. Arquitectura y alcance
+Danny Tatiana Morales Jiménez · Juan Daniel Valderrama Pérez · Camilo Mora Rodriguez
 
-El laboratorio adapta una API de créditos de FastAPI a una arquitectura distribuida con dos microservicios. Service A conserva health, creación, listado, consulta por UUID, actualización de estado y métricas. Service B recibe solicitudes HTTP internas y utiliza PostgreSQL mediante SQLAlchemy y psycopg. Los contratos públicos y las pruebas originales permanecen vigentes. El estado inicial es PENDING y los estados válidos son PENDING, APPROVED y REJECTED.
+Materia: Observabilidad en ambientes productivos
 
-En Docker Compose A resuelve B mediante DNS de servicio y nunca usa localhost para el salto entre contenedores. PostgreSQL emplea un volumen independiente del monitoreo histórico. El modelo relacional registra identificación de la solicitud, campos de entrada y estado, con transacciones para escritura. Un reinicio de B conserva los registros. Para compatibilidad con las pruebas y ejecución histórica sin SERVICE_B_URL, A puede seguir usando un diccionario; ese fallback no representa persistencia y no se usa en el stack del laboratorio.
+Profesora: María Fernanda Ochoa Paipilla
 
-La topología de observabilidad tiene Collector, Jaeger, Prometheus, Grafana y Loki. Cada proceso FastAPI configura su SDK cuando OTEL_ENABLED=true. El Collector recibe OTLP por HTTP y gRPC, procesa memoria y batches y entrega las tres señales a backends consultables. Prometheus también conserva los scrapes /metrics de la aplicación. Grafana integra las fuentes y seis paneles de observabilidad.
+Octubre de 2026
 
-La infraestructura futura AWS/GCP está preparada como Terraform JSON y con imágenes derivadas que incorporan sus configuraciones. Los dos microservicios se empaquetan en una misma tarea o instancia junto con observabilidad, con PostgreSQL administrado externo. Este enfoque es apropiado para una demostración breve pero no permite escalado independiente, alta disponibilidad ni retención durable de señales. La aceptación de ese empaquetado depende de cotejar la guía original de la profesora, que no estuvo disponible en el workspace.
+https://github.com/camilomora90/observability-end-to-end
 
-Este documento distingue evidencia local, código preparado y recursos desplegados. No se ejecutaron acciones en cuentas AWS ni Google Cloud. Las cuentas gratuitas mencionadas por la estudiante no se inspeccionaron y no implican costo cero. Los puertos locales nuevos evitan interferir con los contenedores históricos de monitoreo.
+## 1. Introducción
 
-Archivos de arquitectura: compose.otel.yml, app/main.py, app/service.py, app/storage.py, app/telemetry.py, otel/ e infra/. Guías de reproducción: GUIA_LOCAL.md y NUBES_COSTOS_Y_ELIMINACION.md. Fecha de consolidación: 2026-10-12 20:26 America/Bogota.
+La observabilidad permite conocer el comportamiento de una aplicación e identificar dónde se presentan errores o retrasos. En este laboratorio implementamos OpenTelemetry sobre una API de solicitudes de crédito desarrollada en Python, utilizando dos microservicios y PostgreSQL.
 
-## 2. Instrumentación y señales
+Service A recibe las solicitudes HTTP y se comunica con Service B, encargado de realizar las operaciones sobre la base de datos. Ambos servicios fueron instrumentados para generar métricas, logs estructurados y trazas distribuidas.
 
-La instrumentación automática cubre FastAPI, cliente HTTP httpx y SQLAlchemy. Cada salto crea spans de servidor, cliente y consulta, propagando W3C TraceContext. Los spans personalizados representan creación, lectura, persistencia y actualización de estado. No se agregan documentos o nombres de clientes como atributos de spans ni mensajes de negocio; los datos de carga son sintéticos. Las consultas instrumentadas mantienen parámetros SQL separados.
+OpenTelemetry Collector centraliza estas señales y las distribuye hacia Jaeger, Prometheus y Loki. Grafana facilita su consulta y visualización, mientras que k6 permite evaluar el impacto de la instrumentación sobre el rendimiento. La instrumentación de Python se apoya en las API y el SDK documentados por OpenTelemetry (s. f.).
 
-El SDK configura recursos con service.name y entorno de laboratorio. TracerProvider usa BatchSpanProcessor y exportador OTLP HTTP. MeterProvider emplea un lector periódico con exportación cada cinco segundos. LoggerProvider registra eventos mediante OTLP, además de un handler stdout con formato JSON. Los eventos correlacionados llevan timestamp, nivel, nombre de servicio, trace_id y span_id. Los logs de acceso de uvicorn siguen siendo logs operativos de texto; no se confunden con los registros de negocio exportados.
+El trabajo comprende una implementación local validada, una preparación inicial de recursos en AWS y una propuesta de infraestructura para Google Cloud. Diferenciamos estos alcances porque disponer de archivos o imágenes no demuestra que una aplicación esté funcionando en la nube. Para cada resultado usamos las evidencias guardadas en el repositorio y señalamos las comprobaciones que quedaron pendientes.
 
-El Collector versionado aplica memory_limiter antes de resource y batch. El límite de memoria del procesador es 384 MiB, inferior al máximo del contenedor de 512 MiB. OTLP recibe en 4317 y 4318 dentro de la red de laboratorio. Jaeger recibe trazas por OTLP; Prometheus consulta el exporter de métricas en 8889 y las métricas internas de Collector en 8888. Loki ingiere logs mediante su endpoint OTLP nativo y conserva trace_id como metadato estructurado, sin convertir UUID por solicitud en etiqueta de índice.
+## 2. Arquitectura de observabilidad
 
-El dashboard utiliza las métricas históricas para mantener visibilidad durante el baseline sin SDK. Las mediciones SDK no se suman a las métricas equivalentes de /metrics, evitando duplicar el tráfico aparente. El SDK añade CPU acumulada y memoria del proceso; el benchmark usa docker stats por contenedor, una fuente distinta y explícitamente identificada.
+La Figura 1 presenta la arquitectura local validada y el avance inicial en AWS. La cadena funcional es cliente → Service A → HTTP → Service B → PostgreSQL. El contexto de traza acompaña el salto entre los microservicios y permite relacionar la solicitud con la operación SQL. Este mecanismo sigue el estándar Trace Context de World Wide Web Consortium (2021).
 
-OTEL_ENABLED requiere recrear o reiniciar los procesos con la variable cambiada. false desactiva proveedores e instrumentadores, pero los paquetes siguen instalados y /metrics continúa activo. Así se mide el costo de instrumentar y exportar señales sobre el mismo negocio; no se compara una imagen mínima con otra de dependencias diferentes. El Collector permanece encendido en ambos modos.
+**Figura 1**
 
-Las versiones de SDK e instrumentadores pertenecen a la misma familia compatible 1.38.0 y 0.59b0. Collector 0.139.0, Jaeger 1.64.0, Prometheus 3.2.1, Grafana 11.6.0, Loki 3.4.2 y k6 0.57.0 se fijan para reproducibilidad. Las dependencias efectivas se guardan en la evidencia de freeze.
+*Arquitectura de observabilidad end-to-end con OpenTelemetry*
 
-## 3. Pruebas y correlación
+![Arquitectura local validada y avance inicial en AWS](ARQUITECTURA_OTEL.png)
 
-La suite unitaria contiene las ocho pruebas existentes y dos adicionales. Las primeras comprueban salud, métricas, UUID, estado PENDING, listado, consulta, 404, actualización y rechazo de estado inválido. Las nuevas ejercitan el adaptador HTTP y su traducción de fallos de transporte a 503. El resultado dentro de Docker fue diez pruebas exitosas; las advertencias de deprecación de TestClient se conservan en el registro. Antes de modificar, el Python host no pudo colectar la suite por una dependencia ausente, de modo que no se afirmó una línea base exitosa en ese entorno.
+Nota. La validación funcional se realizó localmente con Docker Compose. En AWS se publicaron imágenes y se prepararon destinos de registros; ECS Fargate representa una etapa propuesta. La recepción de logs, métricas y trazas en AWS quedó sin confirmar.
 
-La integración real utiliza la API publicada localmente y un traceparent sintético. Comprueba creación, lectura, listado, actualización, 404, validación 422 y persistencia después de reiniciar B. Consulta Jaeger y exige una traza con procesos service-a y service-b y un span identificado como PostgreSQL. Consulta Loki por el proxy autenticado de Grafana y exige registros correlacionados de ambos servicios. Verifica además los targets Prometheus y el dashboard provisionado de seis paneles. El resultado fue 13 comprobaciones exitosas.
+Las flechas del bloque AWS representan etapas de preparación y continuación del trabajo, no un flujo de telemetría comprobado entre esos servicios. ECR almacena las imágenes publicadas y CloudWatch Logs dispone de un grupo y un flujo creados. El bloque ECS Fargate corresponde al despliegue propuesto: no hay evidencia suficiente de la aplicación ni del Collector funcionando allí. No se confirmó recepción de logs, métricas personalizadas ni trazas en AWS. GCP no aparece en la figura porque no se desplegó; su propuesta se describe en la sección 6.
 
-El trace_id registrado en esta consolidación es 868d7e4a569d404cb1dcfa718703ab90. El archivo trace.json contiene los spans y procesos reales; logs.json contiene el resultado de Loki; validation.json enumera las aserciones. Esta evidencia es verificable sin depender de una captura de pantalla o una afirmación verbal. Los campos trace_id y span_id en registros OTLP son metadatos estructurados y se correlacionan con la traza del backend.
+En el entorno local, el Collector recibe OTLP, limita el consumo de memoria, agrupa los datos y los entrega a los destinos de cada señal: trazas a Jaeger, métricas a Prometheus y registros a Loki. Grafana consulta estos backends. Una traza reúne spans que describen operaciones y sus relaciones; este modelo permite seguir el recorrido de una solicitud (Jaeger, s. f.). La configuración local y la preparación AWS tienen destinos diferentes y no deben interpretarse como una única validación.
 
-Las métricas son agregadas: no se afirma que compartan un trace_id por cada muestra. El servicio y la ventana temporal permiten contextualizar un pico de latencia frente a trazas y logs. Se configuró un destino para exemplars y un enlace desde trace_id a Jaeger, pero la navegación visual de exemplars y del enlace no se declaró comprobada automáticamente.
+## 3. Implementación y validación local
 
-Una prueba adicional detuvo solamente B y comprobó que A devolviera 503 con el mensaje Credit storage unavailable. Un bloque finally restauró B y esperó su salud. No se borraron datos ni se manipularon los contenedores históricos. La evidencia failure.json conserva el código, respuesta y trace_id de esa falla.
+### 3.1. Instrumentación y persistencia
 
-Las capturas GUI y la cotejación con oTelLabs.zip siguen siendo trabajo editorial o de validación externa. El workspace carece de .git: los archivos están preparados pero no se creó rama ni se publicó repositorio. Estos pendientes no se convierten en resultados completados.
+Ejecutamos la solución mediante Docker Compose e incorporamos instrumentación automática de FastAPI, del cliente HTTP httpx y de SQLAlchemy para PostgreSQL, además de spans personalizados de operaciones de negocio. Service A conserva los endpoints públicos de créditos; Service B realiza la persistencia. El volumen de PostgreSQL permite conservar los datos al reiniciar el microservicio B.
 
-## 4. Benchmark y resultados
+Los registros de negocio incluyen trace_id y span_id para relacionar eventos de una misma solicitud. En las evidencias aparece la traza 868d7e4a569d404cb1dcfa718703ab90, con participación de service-a, service-b y una operación PostgreSQL. Los archivos trace.json y logs.json permiten revisar esa relación junto con las capturas originales de Jaeger y Grafana, sin depender únicamente de la descripción del informe.
 
-Se ejecutó carga constante de cincuenta usuarios virtuales durante cinco minutos en cada modo, precedida por veinte segundos de warm-up. Cada iteración consulta un crédito sintético y actualiza su estado. Los modos comparten UUID, volumen, dependencias y límites por aplicación de un core y 512 MiB. El dataset queda acotado para que el listado creciente o la creación continua no distorsionen la comparación. Las métricas HTTP incluyen nombres estables read/update, evitando series por identificador.
+### 3.2. Pruebas funcionales y de integración
 
-Se midió el p99 de duración HTTP mediante k6. Los JSON resumen conservan además distribución, requests y tasa de errores. Las muestras de docker stats registran timestamp UTC, servicio, CPU porcentual y memoria MiB. CPU representa porcentaje de un core; los promedios A y B se suman para estimar el consumo de aplicaciones. El Collector se reporta aparte para no confundir costo de SDK con costo de procesamiento de señales. Las muestras individuales están disponibles en CSV.
+Completamos diez pruebas automatizadas dentro de Docker y conservamos sus dos advertencias de deprecación en tests.txt. Las pruebas cubren el comportamiento de la API y la traducción de errores de comunicación. Este resultado corresponde al entorno registrado y no a una nueva ejecución realizada para redactar el informe.
 
-Resultado sin SDK: p99 680.39 ms, 24784 solicitudes y tasa de fallo 0.0000%. Resultado con SDK: p99 2026.96 ms, 16396 solicitudes y tasa de fallo 0.0000%. Diferencia p99: +1346.56 ms, equivalente a +197.91% respecto al baseline.
+También aprobamos trece comprobaciones de integración, enumeradas en validation.json: salud, creación, lectura, listado, actualización, respuestas 404 y 422, persistencia tras reiniciar Service B, traza común de A y B, span PostgreSQL, logs correlacionados en Loki mediante Grafana, objetivos activos de Prometheus y seis paneles provisionados. Comprobamos la persistencia consultando el crédito después del reinicio, además de verificar la existencia del volumen.
 
-CPU media A+B: 143.74% sin SDK y 165.91% con SDK. El cambio relativo es +15.42%. Memoria media A+B: 173.25 MiB frente a 199.03 MiB; diferencia +25.78 MiB (+14.88%). Estas cifras no describen CPU del host completo ni memoria RSS de un único proceso.
+En una prueba de falla controlada interrumpimos Service B y verificamos que Service A respondiera HTTP 503 con el mensaje Credit storage unavailable. El archivo failure.json conserva la respuesta y su trace_id. La prueba verifica el comportamiento ante la indisponibilidad de esa dependencia; no mide recuperación automática, alta disponibilidad ni rendimiento durante una falla prolongada.
 
-Se conservó un primer par exploratorio que coincidió con preparación de Terraform. El par final se ejecutó después de terminar instalaciones, builds y validaciones, sin tareas de preparación simultáneas. Los contenedores históricos de monitoreo siguieron activos en ambos modos. El orden fue sin SDK seguido de con SDK; una pareja final no permite calcular intervalos de confianza ni eliminar sesgos de caché y orden. Para estimación estadística se recomienda repetir y alternar orden.
+### 3.3. Consulta de las señales y límites de la validación
 
-OTEL_ENABLED=true se restauró al finalizar. La prueba controlada de fallo es funcional y no una carga de cinco minutos con fallas. No se reportaron benchmarks cloud. Los resultados son observaciones de este host Windows/Docker y este workload, sin generalizar a producción.
+Prometheus registró cuatro objetivos de recolección activos: Service A, Service B, las métricas internas del Collector y su exportador de métricas OpenTelemetry. El estado up comprueba que el scrape fue atendido; para comprobar las operaciones de créditos usamos adicionalmente las pruebas funcionales. Las consultas del dashboard y las capturas muestran la disponibilidad de métricas para su análisis.
 
-## 5. Infraestructura, costos y reversión
+Jaeger permitió visualizar las operaciones de los dos microservicios y PostgreSQL. En Grafana se consultaron métricas y registros almacenados en Loki. La configuración efectiva y las consultas guardadas en correlation-runtime.json verifican la correlación entre logs y trazas con el mismo identificador. Grafana documenta esta consulta de trazas y sus integraciones (Grafana Labs, s. f.-b). No afirmamos que cada muestra de una métrica agregada tenga un trace_id ni que se haya automatizado la navegación visual de exemplars.
 
-AWS prepara una VPC con una subnet pública para ECS y dos privadas para RDS; security groups restringen el acceso al gateway al IPv4 /32 aprobado de la estudiante y PostgreSQL a la tarea. Una tarea Fargate con dos vCPU y cuatro GiB agrupa ocho contenedores. RDS PostgreSQL administra la persistencia; Secrets Manager entrega la contraseña a B sin incorporarla a la imagen. Se preparan seis ECR, un grupo CloudWatch Logs y roles IAM de ejecución y tarea. No se incluyen NAT Gateway ni ALB.
+Además del benchmark, se conservaron escenarios cortos de k6. Errores y pico cumplieron sus umbrales; el escenario normal aprobó las comprobaciones funcionales, pero terminó con código 99 porque su p99 de 1.241,05 ms superó el umbral de 1.000 ms. Por eso no presentamos todas las ejecuciones como éxitos de rendimiento. Estos escenarios cortos son distintos de la comparación de cinco minutos por modo.
 
-Google prepara un servicio Cloud Run con ocho contenedores de un vCPU cada uno y memoria total de 4 GiB. CPU siempre asignada y una instancia mínima sostienen Collector y scrapes de fondo. Cloud SQL mantiene PostgreSQL mediante socket de conexión autorizado; Artifact Registry almacena imágenes derivadas. Secret Manager contiene DB y Grafana y la cuenta de servicio recibe permisos limitados de SQL y secretos. El ingreso requiere IAM run.invoker para una identidad concreta; no se asigna allUsers.
+[Índice de evidencias locales: pruebas, consultas, capturas y archivos de medición.](https://github.com/camilomora90/observability-end-to-end/blob/main/docs/evidence/README.md)
 
-Las imágenes auxiliares incorporan la configuración cloud y usan localhost porque los contenedores comparten el namespace de red de una tarea/instancia. El gateway expone API y rutas de interfaces; OTLP y DB quedan fuera del ingreso público. La configuración local utiliza DNS de Compose y no se confunde con esta excepción del empaquetado cloud. La separación por contenedores no aporta escalado independiente: cotejar ese punto con la guía original.
+## 4. Análisis del overhead
 
-Terraform validate se ejecuta en Docker sin backend y sin credenciales. La validación confirma estructura de recursos y expresiones; no confirma cuotas, permisos efectivos, disponibilidad regional ni arranque remoto. Los providers se fijan mediante lockfiles. Un problema inicial de arranque del provider sobre el bind mount Windows se resolvió con un volumen Linux. No se ejecutaron terraform plan/apply con cuentas.
+Realizamos pruebas con k6 utilizando 50 usuarios virtuales durante cinco minutos por modo, comparando OpenTelemetry desactivado y activado. Cada modo tuvo veinte segundos de calentamiento. La carga consultó y actualizó un mismo crédito sintético, con límites de 1 CPU y 512 MiB por aplicación. k6 registra el comportamiento HTTP de la carga; sus comprobaciones funcionales y sus umbrales permiten evaluar aspectos diferentes de una ejecución (Grafana Labs, s. f.-a).
 
-El costo orientativo de cómputo es US$0.0987/h para Fargate y US$0.5472/h para Cloud Run, antes de RDS/Cloud SQL, discos, secretos, registries, logs, red e impuestos. La cuota o crédito gratuito del usuario no se verificó. Cloud Run con minimum instances=1 y las bases de datos generan costo aunque nadie utilice la API. Consultar las fuentes oficiales y una cotización regional antes de aprobar.
+**Tabla 1. Comparación de rendimiento con y sin OpenTelemetry**
 
-La reversión requiere exportar evidencias y créditos necesarios, aprobar el plan de destroy y borrar únicamente los recursos propios. ECR no fuerza eliminación de imágenes; hay que autorizar su limpieza. El secreto Grafana externo AWS no pertenece al estado y no debe borrarse si era preexistente. Las APIs GCP y el proyecto compartido se conservan. Ambas DB permiten borrado sin protección para demostración: destroy pierde datos. Nada de esto se ejecutó en nube.
+| Indicador | Sin OTel | Con OTel |
+|---|---:|---:|
+| Latencia p99 | 680,39 ms | 2.026,96 ms |
+| CPU media A+B | 143,74 % | 165,91 % |
+| Memoria media A+B | 173,25 MiB | 199,03 MiB |
+| Solicitudes procesadas | 24.784 | 16.396 |
+| Errores HTTP | 0 % | 0 % |
 
-## 6. Conclusiones y entrega
+La instrumentación estuvo asociada con un incremento del 197,91 % en la latencia p99, del 15,42 % en CPU y de 25,78 MiB en memoria, equivalente al 14,88 %. El p99 describe la duración por debajo de la cual queda aproximadamente el 99 % de las solicitudes observadas. Su aumento indica que la parte más lenta de las respuestas tardó más con la instrumentación activa en esta comparación.
 
-La adaptación local cumple la cadena de dos procesos HTTP y PostgreSQL, mantiene los contratos de créditos y ofrece instrumentación automática y personalizada. Las tres señales llegan a backends consultables: trazas en Jaeger, métricas en Prometheus y logs en Loki. Grafana provisiona fuentes y seis paneles. La evidencia incluye una traza común de A/B/DB y registros correlacionados, pruebas funcionales y mediciones de carga. La conclusión se limita a ejecuciones locales comprobadas.
+La CPU media pasó de 143,74 % a 165,91 % para la suma de A y B. Este porcentaje se expresa respecto de un core: puede superar el 100 % porque suma dos contenedores, y no representa el porcentaje de todo el equipo. El cambio equivale aproximadamente a 22,16 puntos porcentuales. La memoria pasó de 173,25 a 199,03 MiB. El consumo del Collector se midió aparte y no forma parte de los valores A+B de la Tabla 1.
 
-Las pruebas unitarias se reproducen en la imagen construida con Dockerfile, montando tests en solo lectura. La integración se reproduce con python scripts/validate_local.py. El benchmark se reproduce con python scripts/benchmark.py y tarda más de diez minutos. Terraform se valida mediante scripts/validate_infra.ps1. La documentación conserva comandos para detener el stack con stop y preservar volúmenes, evitando acciones destructivas como down -v o prune.
+Aunque no se presentaron errores HTTP, con OpenTelemetry se procesaron menos solicitudes en el mismo tiempo: 16.396 frente a 24.784. Con usuarios virtuales constantes, una respuesta más lenta reduce la cantidad de iteraciones que cada usuario puede completar. Por tanto, cero errores no significa rendimiento equivalente: las operaciones siguieron respondiendo, pero con mayor latencia y consumo de recursos en esta ejecución.
 
-La entrega consta de código actualizado, compose.otel.yml, configuraciones OTel/backends, dashboard, scripts de prueba, IaC AWS/GCP, lockfiles y carpeta docs/evidence. ESTADO_FINAL.md enumera por requisito implementación, prueba, archivo, pendiente, riesgo y siguiente paso. GUIA_LOCAL.md explica la operación; NUBES_COSTOS_Y_ELIMINACION.md documenta recursos y costos sin desplegarlos. Este informe tiene seis secciones paginadas y no sustituye las evidencias de ejecución.
+El modo sin OTel desactiva la instrumentación y exportación del SDK, pero conserva las dependencias instaladas, /metrics y los logs por salida estándar. El Collector permanece encendido en ambos modos; en la línea base no recibe OTLP de las aplicaciones. La comparación estima el costo de activar el SDK bajo estas condiciones, no el costo total de instalar todas las herramientas de observabilidad.
 
-Pendientes: obtener y revisar oTelLabs.zip y rúbrica original; confirmar si dos microservicios agrupados en una tarea/instancia satisfacen la evaluación; revisar autores y capturas complementarias; restaurar o inicializar Git con autorización de publicación; repetir más pares de carga para incertidumbre estadística; verificar navegación de enlaces y exemplars en la interfaz. Ninguno de estos pendientes se oculta ni se marca como cumplido por tener archivos preparados.
+Estos resultados corresponden a una pareja final de ejecuciones locales, en orden sin→con, y no deben generalizarse a producción. El equipo Windows/Docker, las cachés, otros contenedores activos y la contención sobre un crédito compartido pueden influir. Conservamos por separado una pareja exploratoria que coincidió con la preparación de Terraform. Para estimar variabilidad haría falta repetir las mediciones y alternar el orden. Revisar el muestreo y el volumen exportado sería una siguiente evaluación; no se presenta como una mejora ya comprobada.
 
-El criterio de Collector desplegado en ambas nubes no está satisfecho. Para cumplirlo se necesita aprobar una propuesta concreta con cuenta/proyecto, región, presupuesto, duración, imágenes y plan Terraform. Después del despliegue autorizado deberán repetirse CRUD, trazas y logs y registrar recursos activos. Las cuentas disponibles no son evidencia de despliegue. El objetivo actual terminó en infraestructura revisable, no en aprovisionamiento remoto.
+[Resultados originales del benchmark y condiciones de ejecución.](https://github.com/camilomora90/observability-end-to-end/blob/main/docs/evidence/benchmark.json)
 
-La seguridad del laboratorio evita secretos versionados y datos personales en telemetría. Los ejemplos locales se publican solo en loopback. La configuración cloud distingue ingreso IAM en GCP y CIDR restringido AWS; AWS sin HTTPS es únicamente una demostración con datos sintéticos. Los estados Terraform que contengan contraseñas deben protegerse y no adjuntarse a la entrega.
+## 5. Implementación inicial en AWS
 
-Fecha de consolidación: 2026-10-12 20:26 America/Bogota. Evidencias principales: validation.json, trace.json, logs.json, targets.json, failure.json, benchmark.json, summaries/CSV de ambos modos y terraform-*-validate.json. Los valores reportados son los guardados en esos archivos, sin datos inventados ni ejecución cloud supuesta.
+### 5.1. Recursos preparados e imágenes publicadas
+
+Realizamos la fase inicial en AWS en Ohio (us-east-2). En nuestra documentación registramos la creación de seis repositorios privados de Amazon ECR: otel-credit-lab/api, otel-credit-lab/collector, otel-credit-lab/prometheus, otel-credit-lab/grafana, otel-credit-lab/loki y otel-credit-lab/gateway. Publicamos las imágenes de la API y del Collector con la etiqueta aws; para los otros cuatro componentes documentamos la creación de los repositorios.
+
+Verificamos la publicación de las dos imágenes mediante consultas a ECR que mostraron la etiqueta y el digest SHA-256. Esto confirma la disponibilidad de los artefactos en el registro. No demuestra que se haya iniciado una tarea de ECS, que los microservicios respondan solicitudes en AWS o que exista conexión con una base de datos remota. En las evidencias revisadas no se acredita la aplicación ni el Collector funcionando en ECS Fargate.
+
+### 5.2. Configuración inicial del Collector y CloudWatch Logs
+
+La imagen del Collector usa OpenTelemetry Collector Contrib 0.139.0 y un archivo collector-aws.yaml. Se configuraron receptores OTLP gRPC en 4317 y HTTP en 4318, procesadores de límite de memoria, atributos de recurso y agrupación por lotes. Los pipelines contemplan exportación de trazas hacia AWS X-Ray, métricas hacia CloudWatch y registros hacia CloudWatch Logs, con autenticadores SigV4. Estos destinos describen la intención de la configuración; su recepción funcional no fue validada.
+
+Creamos el grupo /ecs/otel-credit-lab/otel-logs y el flujo otel en CloudWatch Logs, con retención de siete días. La existencia de un grupo y un flujo prepara el destino de almacenamiento, pero no demuestra que haya eventos de la aplicación. La documentación y las capturas distinguen esta preparación de la recepción efectiva de registros. La propuesta Terraform anterior del repositorio tiene parámetros propios; no se usa como evidencia de los valores realmente preparados en esta fase.
+
+### 5.3. Pruebas en CloudShell y dificultad con SigV4
+
+En AWS CloudShell ejecutamos diez pruebas automatizadas del código descargado mediante pytest. El resultado documentado fue diez pruebas aprobadas, una advertencia de deprecación de HTTPX/Starlette TestClient y aproximadamente 0,75 segundos de ejecución. Tuvimos que instalar dependencias en ese entorno temporal. Este resultado comprueba la suite en CloudShell; no equivale a una prueba de integración de una aplicación desplegada en ECS ni a una validación de la exportación de telemetría.
+
+Validamos la sintaxis YAML del Collector, pero no pudimos completar su prueba de inicio fuera de ECS porque el contenedor de prueba no disponía de credenciales AWS para los autenticadores SigV4. Tener acceso a CloudShell no implica que un contenedor reciba automáticamente las credenciales que necesita. El bloqueo impidió continuar esa comprobación; no permite concluir que corregir las credenciales bastaría para validar todos los exportadores y destinos.
+
+La consulta de CloudWatch Metrics no mostró métricas personalizadas de la aplicación y únicamente registró un resultado asociado al uso de AWS. Tampoco se confirmó la llegada de logs de la aplicación ni de trazas a X-Ray. La comprobación de X-Ray quedó pendiente y no contamos con evidencia para atribuirle una causa adicional. En consecuencia, AWS queda documentado como implementación inicial, con recursos preparados e imágenes publicadas, pero sin validación completa de las tres señales.
+
+### 5.4. Evidencias y comprobaciones pendientes
+
+Conservamos nuestras capturas de ECR, CloudWatch Logs y la salida de pytest en la documentación AWS enlazada a continuación. El siguiente paso técnico sería verificar la identidad y los permisos del entorno de ejecución, revisar la compatibilidad de los destinos configurados, iniciar los servicios y generar solicitudes controladas. Solo después podría comprobarse salud, persistencia y recepción de cada señal. No ejecutamos estas tareas pendientes durante la preparación del informe.
+
+[Documentación de la implementación inicial AWS y capturas originales en GitHub.](https://github.com/camilomora90/observability-end-to-end/blob/main/docs/IMPLEMENTACION_INICIAL_AWS.md)
+
+## 6. Estado de Google Cloud
+
+Para Google Cloud preparamos una propuesta de infraestructura mediante Terraform, orientada a Cloud Run y Cloud SQL, junto con Artifact Registry, IAM y secretos. La evidencia terraform-gcp-validate.json registra valid=true, sin errores ni advertencias. También probamos imágenes y un bundle destinado a nube en Docker local. Estas comprobaciones revisan esquema y funcionamiento local; no prueban permisos, cuotas, conectividad ni servicios activos en Google Cloud.
+
+No efectuamos un despliegue real en GCP ni validamos la recepción de telemetría allí. Quedaron pendientes el aprovisionamiento, la publicación de imágenes, el arranque de servicios y las pruebas de integración con recursos remotos. Por eso esta parte se presenta como infraestructura propuesta y validaciones locales, no como una implementación completada.
+
+[Propuesta de infraestructura GCP.](https://github.com/camilomora90/observability-end-to-end/tree/main/infra/gcp)
+
+## 7. Conclusiones
+
+Con la implementación local comprobamos el recorrido de solicitudes entre Service A, Service B y PostgreSQL, la persistencia después de reiniciar B y la respuesta 503 al interrumpir esa dependencia. Las diez pruebas y las trece comprobaciones de integración respaldan ese alcance. La traza común y los logs correlacionados permitieron relacionar una operación de negocio con su ejecución distribuida, mientras Prometheus y Grafana ofrecieron las métricas y consultas para analizarla.
+
+Con el SDK activo aumentaron p99, CPU y memoria, y disminuyeron las solicitudes procesadas, aunque no hubo errores HTTP. Aprendimos a distinguir funcionamiento y rendimiento y a interpretar cada porcentaje según su unidad y línea base. Una pareja local no permite predecir el overhead en producción ni generalizar el impacto de la instrumentación.
+
+En AWS avanzamos en la creación de seis repositorios ECR, la publicación de la API y del Collector y la preparación de CloudWatch Logs con siete días de retención. Las diez pruebas en CloudShell verificaron la suite en ese entorno. Sin embargo, la falta de credenciales SigV4 en el contenedor de prueba impidió completar el arranque del Collector y no confirmamos métricas personalizadas, registros ni trazas en los servicios AWS. El avance es concreto, pero no constituye un despliegue completo de observabilidad.
+
+Google Cloud quedó como propuesta Terraform con validaciones locales. Quedan pendientes el despliegue y las comprobaciones funcionales y de telemetría remotas. La entrega distingue la base local comprobada, los recursos iniciales de AWS y el trabajo pendiente en ambas nubes.
+
+## 8. Referencias
+
+[Grafana Labs. (s. f.-a). Grafana k6 documentation.](https://grafana.com/docs/k6/latest/)
+
+[Grafana Labs. (s. f.-b). Traces in Explore.](https://grafana.com/docs/grafana/latest/visualizations/explore/trace-integration/)
+
+[Jaeger. (s. f.). Architecture (versión 1.64).](https://www.jaegertracing.io/docs/1.64/architecture/)
+
+[OpenTelemetry. (s. f.). OpenTelemetry Python documentation.](https://opentelemetry-python.readthedocs.io/en/latest/)
+
+[World Wide Web Consortium. (2021, 23 de noviembre). Trace context (W3C Recommendation).](https://www.w3.org/TR/2021/REC-trace-context-1-20211123/)

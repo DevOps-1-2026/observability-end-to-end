@@ -106,4 +106,15 @@ La ejecución se realizó sobre el código descargado en CloudShell. La instalac
 
 Se consultó CloudWatch Metrics para buscar métricas relacionadas con `credit-lab`. La consulta no mostró métricas personalizadas de la aplicación; únicamente apareció un resultado asociado al uso de AWS.
 
-No fue posible completar la comprobación de trazas en AWS X-Ray desde la
+No se confirmó la recepción de trazas en AWS X-Ray. La frase final de la documentación original estaba incompleta y no permite precisar una causa adicional. Esta comprobación se mantiene como pendiente.
+
+No hay evidencia suficiente de la aplicación ni del Collector funcionando en ECS Fargate. Las imágenes publicadas, los repositorios y el grupo de registros no equivalen a un despliegue validado.
+
+## 7. Material de entrega
+
+- [Informe técnico PDF](INFORME_LAB_OTEL.pdf).
+- [Informe editable DOCX](INFORME_LAB_OTEL.docx).
+- [Evidencias locales](evidence/README.md).
+- [Configuración AWS del Collector, preparada sin validación funcional remota](../infra/images/collector-aws.yaml).
+
+Las siete capturas anteriores conservan exactamente sus enlaces y atributos originales. En este documento reunimos nuestros avances; durante su revisión editorial no ejecutamos recursos ni pruebas en AWS.

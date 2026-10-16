@@ -1,6 +1,15 @@
 # Observabilidad end-to-end con OpenTelemetry
 
-Laboratorio de observabilidad de la Maestría en Arquitectura de Software: una API de créditos en FastAPI con dos microservicios, PostgreSQL y trazas, métricas y logs correlacionados. La implementación está validada localmente; la infraestructura de AWS y Google Cloud está preparada y sus despliegues siguen pendientes de autorización.
+Laboratorio de observabilidad de la Maestría en Arquitectura de Software: una API de créditos en FastAPI con dos microservicios, PostgreSQL y trazas, métricas y logs correlacionados. La implementación está validada localmente. En AWS se prepararon recursos en Ohio (`us-east-2`) y se publicaron las imágenes de la API y del Collector; no se confirmó un despliegue en ECS Fargate ni la recepción de las tres señales. Google Cloud conserva una propuesta Terraform sin despliegue real.
+
+## Entrega del laboratorio
+
+1. [Informe técnico PDF](docs/INFORME_LAB_OTEL.pdf) · [versión editable DOCX](docs/INFORME_LAB_OTEL.docx).
+2. [Índice de evidencias locales](docs/evidence/README.md): pruebas, trazas, logs, capturas y benchmark.
+3. [Implementación inicial en AWS y capturas originales](docs/IMPLEMENTACION_INICIAL_AWS.md).
+4. Código y configuraciones: [aplicación](app/), [infraestructura AWS](infra/aws/), [infraestructura GCP](infra/gcp/), [imágenes y configuración cloud](infra/images/), [OpenTelemetry local](otel/) y [Docker Compose](compose.otel.yml).
+
+El informe distingue resultados locales, recursos preparados y validaciones pendientes. Su [versión textual](docs/ENTREGA_LAB_OTEL.md) facilita la lectura en GitHub; la Figura 1 usa la [imagen actualizada del equipo](docs/ARQUITECTURA_OTEL.png) en PDF y DOCX.
 
 ## Autores
 
@@ -97,17 +106,19 @@ El benchmark con y sin SDK conserva sus resultados originales: 50 VUs y cinco mi
 
 - [GUIA_LOCAL.md](docs/GUIA_LOCAL.md): requisitos, ejecución y procedimientos locales.
 - [ESTADO_FINAL.md](docs/ESTADO_FINAL.md): resultados comprobados, benchmark, limitaciones y requisitos pendientes.
-- [INFORME_LAB_OTEL.pdf](docs/INFORME_LAB_OTEL.pdf): informe de entrega de seis páginas.
+- [INFORME_LAB_OTEL.pdf](docs/INFORME_LAB_OTEL.pdf): informe final de 12 páginas, con formato APA 7, con portada estudiantil.
 - [NUBES_COSTOS_Y_ELIMINACION.md](docs/NUBES_COSTOS_Y_ELIMINACION.md): recursos previstos, costos orientativos y eliminación.
 - [Evidencias reales](docs/evidence/): pruebas, consultas, capturas y mediciones conservadas.
 
-## AWS y Google Cloud: preparado y pendiente
+## AWS y Google Cloud: avances y pendientes
 
-| Plataforma | Infraestructura preparada | Despliegue pendiente |
+| Plataforma | Avance documentado | Pendiente |
 |---|---|---|
-| AWS ECS Fargate | [infra/aws/](infra/aws/): tarea con microservicios y observabilidad, RDS PostgreSQL, ECR, red, IAM, logs y secretos | Revisión del plan y costos, autorización, publicación de imágenes y despliegue real |
-| Google Cloud Run | [infra/gcp/](infra/gcp/): servicio con microservicios y observabilidad, Cloud SQL PostgreSQL, Artifact Registry, IAM y secretos | Revisión del plan y costos, autorización, publicación de imágenes y despliegue real |
+| AWS, Ohio (`us-east-2`) | Seis repositorios ECR creados, imágenes API y Collector publicadas, grupo y flujo CloudWatch Logs con retención de siete días; diez pruebas aprobadas en CloudShell | Confirmar servicios activos y validar métricas personalizadas, logs y trazas. El inicio del Collector fuera de ECS quedó bloqueado por ausencia de credenciales SigV4 |
+| Google Cloud | [Propuesta Terraform](infra/gcp/) y validaciones locales de esquema e imágenes | Publicar imágenes, desplegar recursos y comprobar aplicación y telemetría en la nube |
 
-Terraform pasó validación local de esquema; las imágenes y el bundle se probaron en Docker local. Esto no acredita recursos desplegados: no se ejecutaron planes/applies contra cuentas ni se publicaron imágenes. Los microservicios están agrupados en una tarea o instancia para la demostración; la equivalencia con la rúbrica y el escalado independiente siguen sujetos a revisión.
+La [documentación AWS](docs/IMPLEMENTACION_INICIAL_AWS.md) conserva las capturas y el alcance de cada comprobación. Publicar una imagen en ECR no demuestra un servicio funcionando en ECS Fargate. Las pruebas en CloudShell tampoco prueban el flujo de telemetría. No se confirmó recepción de las tres señales en CloudWatch/X-Ray y no se ejecutó un despliegue en GCP.
 
-Los despliegues de ambas nubes permanecen pendientes de autorización explícita. Antes de crear recursos se deben acordar servicios, región, presupuesto, duración y plan de eliminación. Las cuentas gratuitas no garantizan costo cero; cómputo, bases de datos, almacenamiento, logs y red pueden consumir presupuesto. Consultar [costos y eliminación](docs/NUBES_COSTOS_Y_ELIMINACION.md) antes de aprobar cualquier acción remota.
+La [propuesta Terraform AWS](infra/aws/) y el bundle probado en Docker local son artefactos de preparación; no certifican aprovisionamiento remoto. La preparación inicial AWS documentada usa exportación prevista hacia servicios AWS, mientras el bundle anterior tiene backends propios. No se consideran una única implementación validada.
+
+Antes de cualquier trabajo remoto adicional deben revisarse cuenta, región, permisos, presupuesto, duración y eliminación. La [guía de costos y eliminación](docs/NUBES_COSTOS_Y_ELIMINACION.md) describe la propuesta anterior y sus límites. Esta actualización documental no ejecutó recursos en ninguna nube ni realizó commit o push.
